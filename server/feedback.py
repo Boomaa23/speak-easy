@@ -1,38 +1,36 @@
 import os
 import difflib
-from google.cloud import speech
+import speech_recognition as sr
 from pydub import AudioSegment
 
-# Set up Google Cloud credentials
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'path_to_your_service_account_file.json'
-
 def transcribe_audio(file_path):
-    client = speech.SpeechClient()
-    audio = AudioSegment.from_file(file_path).set_channels(1).set_frame_rate(16000)
+    """Transcribe the given audio file to text using SpeechRecognition."""
+    recognizer = sr.Recognizer()
+    audio = AudioSegment.from_file(file_path)
+
+    # Convert audio to a format supported by SpeechRecognition
     temp_file = "temp.wav"
     audio.export(temp_file, format="wav")
 
-    with open(temp_file, "rb") as audio_file:
-        content = audio_file.read()
-
-    audio = speech.RecognitionAudio(content=content)
-    config = speech.RecognitionConfig(
-        encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=16000,
-        language_code="en-US",
-    )
-
-    response = client.recognize(config=config, audio=audio)
-
-    for result in response.results:
-        return result.alternatives[0].transcript
+    with sr.AudioFile(temp_file) as source:
+        audio_data = recognizer.record(source)  # Read the entire audio file
+        try:
+            # Use the Google Web Speech API for transcription
+            transcription = recognizer.recognize_google(audio_data)
+            return transcription
+        except sr.UnknownValueError:
+            return "Could not understand audio."
+        except sr.RequestError as e:
+            return f"Could not request results from Google Speech Recognition service; {e}"
 
 def compare_transcriptions(correct_transcription, user_transcription):
+    """Compare correct and user transcriptions and return the differences."""
     d = difflib.Differ()
     diff = list(d.compare(correct_transcription.split(), user_transcription.split()))
     return '\n'.join(diff)
 
 def generate_suggestions(differences):
+    """Generate suggestions based on the differences between the transcriptions."""
     missing_words = []
     extra_words = []
     feedback = []
@@ -58,8 +56,8 @@ def generate_suggestions(differences):
 
 if __name__ == "__main__":
     # File paths for the correct pronunciation and user audio
-    correct_audio_file_path = "path_to_correct_audio.wav"
-    user_audio_file_path = "path_to_user_audio.wav"
+    correct_audio_file_path = "path_to_correct_audio.wav"  # Change this to your correct audio file path
+    user_audio_file_path = "path_to_user_audio.wav"  # Change this to your user's audio file path
 
     # Transcribe both audio files
     correct_transcription = transcribe_audio(correct_audio_file_path)
