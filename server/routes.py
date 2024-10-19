@@ -11,7 +11,7 @@ index_w = 0
 index_p = 0
 
 
-@api_blueprint.route('/api/eggs', methods=['GET'])
+@api_blueprint.route('/api/', methods=['GET'])
 def api_get_eggs():
     return "eggs"
 
