@@ -185,7 +185,7 @@ const PracticeLangPage = () => {
               )}
               {exAudioPlayed && (
                 <div>
-                  Now it's your turn:
+                  Now it's your turn!
                   <b></b>
                   Click the microphone icon to start recording:
                   <span className={`mic-icon ${isRecording ? 'recording' : ''}`} onClick={toggleRecording}>
