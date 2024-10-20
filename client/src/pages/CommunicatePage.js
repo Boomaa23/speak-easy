@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './pages.css'; // Import the custom styles
 import { FaMicrophone, FaPlay } from 'react-icons/fa'; // Import microphone and play button icons
-import { getCookie } from '../cookieUtils.js';
+import { getCookie } from '../cookieUtils.js'; // Assuming you have a utility to get cookies
+import './pages.css'; // Import the custom styles
 
 const CommunicatePage = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -13,6 +13,7 @@ const CommunicatePage = () => {
   const [showRecordingSection, setShowRecordingSection] = useState(false);
   const [playingAudio, setPlayingAudio] = useState(false);
   const [translatedAudioURL, setTranslatedAudioURL] = useState(''); // URL for translated audio
+  const [translatedText, setTranslatedText] = useState(''); // State for translated text
   const navigate = useNavigate();
 
   // Handle the "recording ..." dot animation
@@ -39,19 +40,16 @@ const CommunicatePage = () => {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const mediaRecorder = new MediaRecorder(stream);
         setRecorder(mediaRecorder);
-
         const audioChunks = [];
         mediaRecorder.ondataavailable = (event) => {
           audioChunks.push(event.data);
         };
-
         // Store the audio chunks when recording stops
         mediaRecorder.onstop = () => {
           const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
           const audioUrl = URL.createObjectURL(audioBlob);
           setAudioURL(audioUrl); // Store the URL to play back
         };
-
         mediaRecorder.start();
         setIsRecording(true);
       } else {
@@ -63,33 +61,35 @@ const CommunicatePage = () => {
 
   const handleTranslate = async () => {
     if (audioURL) {
-      const audio_response = await fetch(audioURL);
-      const audioBlob = await audio_response.blob(); // Get the audio file as a Blob
+      try {
+        const audio_response = await fetch(audioURL);
+        const audioBlob = await audio_response.blob(); // Get the audio file as a Blob
+        const formData = new FormData(); // Create FormData here
+        const user_id = getCookie("user_id"); // Corrected cookie retrieval
+        formData.append('audio', audioBlob, 'audio.mp3');
+        formData.append('user_id', user_id);
+        formData.append('language', selectedLanguage);
+        console.log("1")
 
-      const formData = new FormData(); // Create FormData here
+        // Send audio to backend
+        const response = await fetch('http://localhost:5000/api/upload_get_translate', {
+          method: 'POST',
+          body: formData,
+        });
+        console.log("2")
 
-      const user_id = getCookie("user_id"); // Corrected cookie retrieval
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
 
-      formData.append('audio', audioBlob, 'audio.mp3');
-      formData.append('user_id', user_id);
-      formData.append('language', selectedLanguage);
+        const translatedAudioBlob = await response.blob();  // Get the audio as a Blob
+        const translatedAudioURL = URL.createObjectURL(translatedAudioBlob);  // Create an object URL
+        setTranslatedAudioURL(translatedAudioURL);  // Set the URL so it can be played
+        console.log('Translated Audio URL:', translatedAudioURL);
 
-      // Send audio to backend (example: using fetch)
-      const response = await fetch('http://127.0.0.1:5000/api/upload_get_translate', {
-        method: 'POST',
-        body: formData,
-      });
-
-      // Check if request was successful
-      if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
+      } catch (error) {
+        console.error("Error during translation process:", error);
       }
-
-      const translatedBlob = await response.blob();
-
-      const translatedAudioURL = URL.createObjectURL.apply(translatedBlob);
-
-      setAudioURL(translatedAudioURL);
     }
   };
 
@@ -105,7 +105,6 @@ const CommunicatePage = () => {
       const audio = new Audio(translatedAudioURL);
       setPlayingAudio(true);
       audio.play();
-
       audio.onended = () => {
         setPlayingAudio(false); // Reset when audio finishes
       };
@@ -122,9 +121,9 @@ const CommunicatePage = () => {
           </div>
           <div className="language-buttons">
             {['EN', 'ES', 'FR'].map((lang) => (
-              <button 
-                key={lang} 
-                className={`language-btn ${selectedLanguage === lang ? 'selected' : ''}`} 
+              <button
+                key={lang}
+                className={`language-btn ${selectedLanguage === lang ? 'selected' : ''}`}
                 onClick={() => handleLanguageSelect(lang)}
               >
                 {lang}
@@ -138,7 +137,7 @@ const CommunicatePage = () => {
       {showRecordingSection && (
         <>
           <div className="core-text">
-            Let's talk in a different language! In <span className="highlight-bold">English</span>, 
+            Let's talk in a different language! In <span className="highlight-bold">English</span>,
             please record yourself saying what you want to translate.
             <br />
             <br />
@@ -151,6 +150,7 @@ const CommunicatePage = () => {
           {isRecording && (
             <div className="recording-status">Recording{dots}</div>
           )}
+
           {audioURL && !isRecording && (
             <div className="actions">
               <button className="action-btn" onClick={toggleRecording}>Record Again</button>
@@ -162,10 +162,10 @@ const CommunicatePage = () => {
           {translatedAudioURL && (
             <div className="translated-audio">
               <div className="core-text">
-                Translated text with your tone:
+                Translated audio with your tone: 
               </div>
-              <span 
-                className={`play-icon ${playingAudio ? 'playing' : ''}`} 
+              <span
+                className={`play-icon ${playingAudio ? 'playing' : ''}`}
                 onClick={handlePlayAudio}
               >
                 <FaPlay size={30} />

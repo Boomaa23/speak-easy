@@ -104,6 +104,7 @@ def api_upload_audio_comm():
     translator = Translator()
     translation_raw = translator.translate(user_transcription, dest=language)
     translation = translation_raw.text
+    print(user_transcription)
     print(translation)
     # Retrieve the voice id of the user for the desired language
     user_id = request.form["user_id"]
