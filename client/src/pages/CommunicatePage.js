@@ -153,14 +153,17 @@ const CommunicatePage = () => {
           {translatedAudioURL && (
             <div className="translated-audio">
               <div className="core-text">Translated audio with your tone:</div>
-              <span
-                className={`play-icon ${playingAudio ? 'playing' : ''}`}
-                onClick={handlePlayAudio}
-              >
-                <FaPlay size={30} />
-              </span>
+              <div className="actions">
+                <span
+                  className={`play-icon ${playingAudio ? 'playing' : ''}`}
+                  onClick={handlePlayAudio}
+                >
+                  <FaPlay />
+                </span>
+              </div>
             </div>
           )}
+
         </>
       )}
     </div>

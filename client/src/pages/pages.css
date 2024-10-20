@@ -228,3 +228,37 @@
 .fade-in-out.hidden {
     opacity: 0;
 }
+
+/* Play icon improvements */
+.play-icon {
+    cursor: pointer;
+    transition: transform 0.3s, color 0.3s, background-color 0.3s;
+    font-size: 40px; /* Make it a bit larger */
+    padding: 10px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+}
+
+.play-icon:hover {
+    background-color: var(--hover-color);
+    transform: scale(1.2);
+    color: white;
+}
+
+.play-icon.playing {
+    color: var(--playing-color);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
