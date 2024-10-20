@@ -1,18 +1,35 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { getCookie } from '../cookieUtils.js'; // Assuming you have a utility to get cookies
 import './pages.css'; // Import the custom styles
 
 const PracticeLangPage = () => {
   const [language, setLanguage] = useState('');
+  const [langCode, setLangCode] = useState('');
   const [phrase, setPhrase] = useState('');
   const [audioUrl, setAudioUrl] = useState('');
   const practiceRef = useRef(null); // Create a ref to scroll to
 
   const handleLanguageSelect = async (lang) => {
     setLanguage(lang);
+    if (lang === 'Spanish') {
+      setLangCode('es');
+    }
+    if (lang === 'French') {
+      setLangCode('fr');
+    }
 
     // Fetch the phrase and audio clip from the backend
     try {
-      const response = await fetch(`your-backend-endpoint/${lang}`); // Adjust the endpoint as needed
+      const formData = new FormData(); // Create FormData here
+      const user_id = getCookie("user_id"); // Corrected cookie retrieval
+      formData.append('user_id', user_id);
+      formData.append('language', langCode);
+
+      const response = await fetch('http://localhost:5000/api/upload_get_translate', {
+        method: 'POST',
+        body: formData,
+      });
+
       const data = await response.json();
       setPhrase(data.phrase); // Assuming the API response contains a 'phrase'
       setAudioUrl(data.audioUrl); // Assuming the API response contains an 'audioUrl'

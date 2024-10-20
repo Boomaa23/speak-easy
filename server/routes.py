@@ -77,7 +77,7 @@ def api_upload_audio_learn():
     user_transcription = feedback.transcribe_audio('last_try.mp3')
 
     # Retrieve and transcribe the example audio file
-    correct_audio_path = "last_example.mp3"
+    correct_audio_path = "audio_phrase_learn.mp3"
     correct_transcription = feedback.transcribe_audio(correct_audio_path)
 
     # Compare transcriptions and make suggestions
@@ -149,7 +149,9 @@ def api_get_next_word():
     i = index_w % 10
     language = request.args.get('language', 'en')
     index_w += 1
-    return jsonify(words.practice_word(i, language))
+    result_word = words.practice_word(i, language)
+    result_word_en = words.practice_word(i, 'en')
+    return {"phrase": result_word, "phrase_en": result_word_en}
 
 
 # Learning Mode: retrieves the next phrase to practice
@@ -159,10 +161,16 @@ def api_get_next_phrase():
     i = index_p % 10
     language = request.args.get('language', 'en')
     index_p += 1
-    return jsonify(words.practice_phrase(i, language))
+    result_phrase = words.practice_phrase(i, language)
+    result_phrase_en = words.practice_phrase(i, 'en')
+    return {"phrase": result_phrase, "phrase_en": result_phrase_en}
 
 
 # Learning Mode: Stores and returns a given phrase in a given language
+# must supply the following inputs:
+# words = the phrase to be spoken
+# user_id = the unique id of the consumer
+# language = the language of words (the language the result will be spoken in)
 @api_blueprint.route('/api/speak', methods=['POST'])
 def api_speak():
     language = request.form.get('language', 'en')
@@ -170,23 +178,31 @@ def api_speak():
     user_id = request.form.get("user_id")
     user = storage.get_user_by_id(user_id=user_id)
     voice_id = user.get_voiceid_from_lang(language) 
-    response = cartesia.text_to_speech(words, voice_id, language)
-
-    if response.status_code == 200:
-        # Save the audio clip to the root directory
-        with open('last_example.mp3', 'wb') as audio_file:
-            audio_file.write(response.content)
-
-        # Send the file back in the response
-        mp3_buffer = io.BytesIO(response.content)
-        response = make_response(send_file(
-            mp3_buffer,
-            as_attachment=True,
-            download_name="output.mp3",
-            mimetype="audio/mpeg"
-        ))
-        return response
+    user = storage.get_user_by_id(user_id=user_id)
+    if (user.speaks_lang(language)):
+        voice_id = user.get_voiceid_from_lang(language)
     else:
-        return jsonify({"error": "Failed to generate audio",
-                        "status": response.status_code, "message": response.text}), response.status_code
-
+        # FUTURE TODO: When we support training on languages other than 
+        # English, change this logic to support taking base 
+        # voiceids from other languages as well
+        base_voice_id = user.get_voiceid_from_lang("en")
+        response = cartesia.localize_voice(base_voice_id, language)
+        # Construct input for saving this in voice db
+        voice_id = json.loads(response.content).get("id")
+        is_public = json.loads(response.content).get("is_public")
+        curr_time = datetime.now()
+        voice_user_input = {
+            "voice_id": voice_id,
+            "user_id": user_id,
+            "language": "en",
+            "is_public": is_public,
+            "description": f"{user_id} (en)",
+            "created_at": curr_time 
+        }
+        storage.create_voice(voice_user_input)
+    # Create the translated version of the audio file in your voice
+    print(f"words: {words}\n voice_id: {voice_id}\n language: {language}")
+    tts_response = cartesia.text_to_speech(words, voice_id, language)
+    with open ('audio_phrase_learn.mp3', 'wb') as f:
+        f.write(tts_response.content)
+    return send_file('audio_phrase_learn.mp3',  mimetype='audio/mpeg')
