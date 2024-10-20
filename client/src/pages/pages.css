@@ -1,0 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+.page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #d2b48c; /* Light brown monochrome background */
+    color: #4b3d2a; /* Dark brown text color */
+    /* font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Sans-serif font */ 
+    font-family: "Inter", sans-serif;
+    text-align: center;
+    flex-direction: column; /* Stack items vertically */
+}
+  
+.core-text {
+    font-size: 2.5rem; /* Adjust font size to fill up most of the page */
+    line-height: 1.5;
+    max-width: 80%;
+}
+
+.highlight-bold {
+    font-weight: 700; /* Make 'SpeakEasy' bolder */
+}
+
+.hover-highlight {
+    cursor: pointer;
+    position: relative;
+    border-radius: 10px; /* Rounded corners */
+    padding: 0 5px; /* Add padding for better highlight visibility */
+    transition: background-color 0.6s ease-in-out, color 0.6s ease-in-out; /* Longer fade */
+}
+
+.hover-highlight:hover {
+    color: #8b4513; /* Change text color on hover (saddle brown) */
+    background-color: #f5deb3; /* Highlight background (wheat color) */
+    border-radius: 15px; /* Smoother rounded corners on hover */
+}
+
+.mic-icon {
+    display: inline-block;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.mic-icon.recording {
+    color: red;
+    transform: scale(1.2); /* Slightly enlarge the icon while recording */
+}
+
+.recording-status {
+    font-size: 1.5rem;
+    color: #8b4513;
+    margin-top: 20px;
+}
+
+.actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.action-btn {
+    font-size: 2rem;
+    margin: 10px;
+    padding: 20px 20px;
+    background-color: #8b4513; /* Saddle brown button */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.action-btn:hover {
+    background-color: #f5deb3; /* Wheat color on hover */
+    color: #4b3d2a;
+}
+
+.play-icon {
+cursor: pointer;
+transition: color 0.3s ease;
+}
+
+.play-icon.playing {
+    color: red; /* Change color while playing */
+}
+
+.playing-status {
+    font-size: 1.2rem;
+    color: #8b4513;
+    margin-top: 10px;
+}
+
+.translated-audio {
+    margin-top: 20px;
+}
+
+.language-btn.selected {
+    background-color: #8b4513; /* Dark brown for selected */
+    color: white;
+}
+  
+.language-btn:disabled {
+    background-color: #d2b48c; /* Dimmed color */
+    cursor: not-allowed;
+}
+
+.language-buttons {
+    margin-top: 20px;
+}
+  
+.language-btn {
+    font-size: 1.5rem;
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #e5c8a7; /* Light beige */
+    color: #4b3d2a;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+  
