@@ -86,8 +86,8 @@ const TrainingInputPage = () => {
     <div className="page-container">
       <div className="core-text">
         First, we're going to need to know how you sound. Please record a 10-20 second sample of yourself 
-        speaking. You can say whatever you want, just make sure that you speak in your 
-        <span className="highlight-bold"> native language</span>. Please speak as clearly as possible, 
+        speaking. You can say whatever you want, just make sure that you speak in 
+        <span className="highlight-bold"> English</span>. Please speak as clearly as possible, 
         avoiding background noises and long pauses.
         <br />
         <br />

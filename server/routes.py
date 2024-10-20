@@ -135,7 +135,7 @@ def api_upload_audio_comm():
     # Create the translated version of the audio file in your voice
     print(f"translation: {translation}\n voice_id: {voice_id}\n language: {language}")
     tts_response = cartesia.text_to_speech(translation, voice_id, language)
-    print(tts_response.content)
+    #print(tts_response.content)
     with open ('audio_result.mp3', 'wb') as f:
         f.write(tts_response.content)
     return tts_response

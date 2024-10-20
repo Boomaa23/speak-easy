@@ -135,8 +135,8 @@ const CommunicatePage = () => {
       {showRecordingSection && (
         <>
           <div className="core-text">
-            Let's talk in a different language! In your <span className="highlight-bold">native language</span>, 
-            record yourself saying what you want to translate.
+            Let's talk in a different language! In <span className="highlight-bold">English</span>, 
+            please record yourself saying what you want to translate.
             <br />
             <br />
             Click the microphone icon to start recording:
