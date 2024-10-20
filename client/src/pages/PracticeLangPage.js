@@ -9,7 +9,7 @@ const PracticeLangPage = () => {
   const [foreignphrase, setFPhrase] = useState('');
   const [englishphrase, setEPhrase] = useState('');
   const [exampleAudioUrl, setExAudioUrl] = useState('');
-  const [isVisible, setIsVisible] = useState(true);
+  const [isLoading, setIsLoading] = useState(false); // New loading state
   const [audioUrl, setAudioUrl] = useState('');
   const [feedback, setFeedback] = useState('');
   const [exAudioPlayed, setExAudioPlayed] = useState(false);
@@ -52,6 +52,7 @@ const PracticeLangPage = () => {
 
   // Function to fetch example speech using the updated foreignphrase
   const fetchExampleSpeech = async (langCode, foreignphrase) => {
+    setIsLoading(true); // Set loading state to true
     const formData2 = new FormData();
     const user_id = getCookie("user_id"); // Corrected cookie retrieval
     formData2.append('user_id', user_id);
@@ -67,6 +68,7 @@ const PracticeLangPage = () => {
     const AudioBlob = await speak_response.blob();  // Get the audio as a Blob
     const AudioURL = URL.createObjectURL(AudioBlob);  // Create an object URL
     setExAudioUrl(AudioURL);  // Set the URL so it can be played
+    setIsLoading(false); // Set loading state to false
     console.log(AudioURL);
     console.log("retrieved example speech");
   };
@@ -143,29 +145,35 @@ const PracticeLangPage = () => {
       {/* New text section that appears after a language is selected */}
       {language && (
         <div ref={practiceRef} className="core-text">
-          {exampleAudioUrl && (
-            <div>
-              <h3>Alright, let's practice some {language} pronunciation.</h3>
-              Try to say "{englishphrase}" in {language}: <br /> {foreignphrase}
-              <br />
-              <span>Here's how you should sound: </span>
-              <button className="play-button" onClick={handlePlayAudio}>Play</button>
-            </div>
-          )}
-          {exAudioPlayed && (
-            <div>
-              Now it's your turn:
-              <b></b>
-              Click the microphone icon to start recording:
-              <span className={`mic-icon ${isRecording ? 'recording' : ''}`} onClick={toggleRecording}>
-                <FaMicrophone size={30} />
-              </span>
-            </div>
-          )}
-          {audioUrl && !isRecording && (
-            <div>
-              Here's how you did: {feedback}
-            </div>
+          {isLoading ? ( // Show loading message when fetching
+            <div className="loading-screen">Loading example speech...</div>
+          ) : (
+            <>
+              {exampleAudioUrl && (
+                <div>
+                  <h3>Alright, let's practice some {language} pronunciation.</h3>
+                  Try to say "{englishphrase}" in {language}: <br /> {foreignphrase}
+                  <br />
+                  <span>Here's how you should sound: </span>
+                  <button className="play-button" onClick={handlePlayAudio}>Play</button>
+                </div>
+              )}
+              {exAudioPlayed && (
+                <div>
+                  Now it's your turn:
+                  <b></b>
+                  Click the microphone icon to start recording:
+                  <span className={`mic-icon ${isRecording ? 'recording' : ''}`} onClick={toggleRecording}>
+                    <FaMicrophone size={30} />
+                  </span>
+                </div>
+              )}
+              {audioUrl && !isRecording && (
+                <div>
+                  Here's how you did: {feedback}
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
