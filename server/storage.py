@@ -72,9 +72,12 @@ class VoiceModel(db.Model):
     
     # Instance method to delete the voice model
     def delete(self):
-        """Delete this voice model."""
+        """Delete this voice model and return success status."""
         db.session.delete(self)
         db.session.commit()
+        deleted = VoiceModel.query.get(self.id)
+        return deleted is None  # Return True if deletion succeeded
+
 
 
 # -------------------------
