@@ -25,10 +25,9 @@ def api_get_eggs():
 def api_train():
     if 'audio' not in request.files:
         return jsonify({'error': 'No audio file provided'}), 400
-
     audio = request.files['audio']
-    audio_pcm = None #TODO convert audio to PCM
-    response = clone_voice(audio_pcm)
+    with open(audio, 'rb') as f:
+        response = clone_voice(f)
     if response.status_code == 200:
         create_user(response.json())
         create_voice(response.json())
