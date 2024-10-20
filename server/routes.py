@@ -34,7 +34,7 @@ def api_train():
         return jsonify({'error': 'No audio file provided'}), 400
     audio = request.files['audio']
     embedding_resp = cartesia.clone_voice(audio.read())
-    print(embedding_resp.content)
+    #print(embedding_resp.content)
     embedding = json.loads(embedding_resp.content).get("embedding")
     #embedding = embedding_resp.json().get("embedding")
     user_id = uuid.uuid4().hex
@@ -59,7 +59,7 @@ def api_train():
     if 200 <= response.status_code < 300:
         storage.create_user(create_user_input)
         storage.create_voice(voice_user_input)
-        return {"user_id": response.json().get("user_id")}
+        return {"user_id": user_id}
     else:
         return jsonify({"error": "Failed to clone voice", "status": response.status_code, "message": response.text}), response.status_code
     
@@ -93,7 +93,7 @@ def api_upload_audio_comm():
     if 'audio' not in request.files:
         return jsonify({'error': 'No audio file provided'}), 400
     audio = request.files['audio']
-    language = request.form.get('language', 'en')
+    language = request.form.get('language', 'en').lower()
 
     # Save and transcribe the audio file
     user_audio_path = os.path.join(os.path.expanduser('~'), 'last_try.mp3')
@@ -102,8 +102,9 @@ def api_upload_audio_comm():
     
     # Translate the audio file
     translator = Translator()
-    translation = translator.translate(user_transcription, dest=language)
-
+    translation_raw = translator.translate(user_transcription, dest=language)
+    translation = translation_raw.text
+    print(translation)
     # Retrieve the voice id of the user for the desired language
     user_id = request.form["user_id"]
     user = storage.get_user_by_id(user_id=user_id)
@@ -114,6 +115,7 @@ def api_upload_audio_comm():
         # English, change this logic to support taking base 
         # voiceids from other languages as well
         base_voice_id = user.get_voiceid_from_lang("en")
+        print(f"language: {language}, base voice id: {base_voice_id}")
         response = cartesia.localize_voice(base_voice_id, language)
         
         # Construct input for saving this in voice db
@@ -131,7 +133,11 @@ def api_upload_audio_comm():
         storage.create_voice(voice_user_input)
 
     # Create the translated version of the audio file in your voice
+    print(f"translation: {translation}\n voice_id: {voice_id}\n language: {language}")
     tts_response = cartesia.text_to_speech(translation, voice_id, language)
+    print(tts_response.content)
+    with open ('audio_result.mp3', 'wb') as f:
+        f.write(tts_response.content)
     return tts_response
 
 

@@ -13,7 +13,7 @@ _REQUEST_HEADERS = {
 def text_to_speech(text, voice_id, language):
     return _cartesia_request(
         '/tts/bytes',
-        data={
+        data=json.dumps({
             'model_id': ('sonic-english' if language == 'en' else 'sonic-multilingual'),
             'transcript': text,
             'voice': {
@@ -22,13 +22,18 @@ def text_to_speech(text, voice_id, language):
             },
             'output_format': {
                 'container': 'mp3',
-                'bit_rate': 320000,
-                'sample_rate': 44100
+                'bit_rate': 128000,
+                'sample_rate': 44100,
+                'encoding': 'pcm_f32le'
             },
             'language': language
-        },
+        }),
         method='POST',
-        headers = _REQUEST_HEADERS
+        headers = {
+            'Cartesia-Version': '2024-10-19',
+            'X-API-Key': os.getenv('CARTESIA_API_KEY'),
+            "Content-Type": "application/json"
+        }
     )
 
 
@@ -44,24 +49,28 @@ def clone_voice(audio_bytes):
 
 def localize_voice(voice_id, target_language):
     original_voice = _cartesia_request(
-        f'/voices/get/{voice_id}',
+        f'/voices/{voice_id}',
         method='GET',
         headers = _REQUEST_HEADERS
-    ).json()
-
+    )
+    og_voice = json.loads(original_voice.content)
     localized_embedding = _cartesia_request(
         '/voices/localize',
-        data={
-            'embedding': original_voice['embedding'],
+        data=json.dumps({
+            'embedding': og_voice.get('embedding'),
             'language': target_language,
             'original_speaker_gender': 'male',  # TODO auto-select for female speakers
-            'dialect': 'us'
-        },
+            #'dialect': 'us'
+        }),
         method='POST',
-        headers = _REQUEST_HEADERS
+        headers = {
+            'Cartesia-Version': '2024-10-19',
+            'X-API-Key': os.getenv('CARTESIA_API_KEY'),
+            "Content-Type": "application/json"
+        }
     ).json()
 
-    localized_voice = create_voice(original_voice['name'], target_language, localized_embedding['embedding'])
+    localized_voice = create_voice(og_voice.get('name'), target_language, localized_embedding['embedding'])
 
     return localized_voice
 

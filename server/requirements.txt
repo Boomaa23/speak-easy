@@ -1,7 +1,7 @@
 flask==3.0.3
 flask-cors==5.0.0
 Flask-SQLAlchemy==3.0.4
-googletrans==3.0.0
+googletrans==4.0.0-rc1
 pydub==0.25.1
 python-dotenv==1.0.0
 requests==2.32.3

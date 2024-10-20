@@ -75,7 +75,7 @@ const CommunicatePage = () => {
       formData.append('language', selectedLanguage);
 
       // Send audio to backend (example: using fetch)
-      const response = await fetch('http://127.0.0.1:5000/api/train', {
+      const response = await fetch('http://localhost:5000/api/upload_get_translate', {
         method: 'POST',
         body: formData,
       });
@@ -85,6 +85,7 @@ const CommunicatePage = () => {
         throw new Error(`Error: ${response.statusText}`);
       }
       const data = await response.json();  // Parse JSON response
+      console.log(data)
     //   setTranslatedAudioURL(data.translatedAudioUrl); // Assuming you want to save the translated audio URL
     }
   };
