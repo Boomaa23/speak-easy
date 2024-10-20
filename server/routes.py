@@ -4,7 +4,8 @@ import io
 import os
 import cartesia
 import feedback
-
+import uuid
+import time
 import storage 
 from googletrans import Translator
 from flask import make_response, send_file, request, jsonify
@@ -31,10 +32,29 @@ def api_train():
     if 'audio' not in request.files:
         return jsonify({'error': 'No audio file provided'}), 400
     audio = request.files['audio']
-    response = cartesia.clone_voice(audio)
+    embedding_resp = cartesia.clone_voice(audio.read())
+    embedding = embedding_resp.json().get("embedding")
+    user_id = uuid.uuid4().hex
+    response = cartesia.create_voice(user_id, "en", embedding)
+    print(response)
+    #print(response.content)
+    curr_time = time.time()
+    create_user_input = {
+        "user_id": user_id,
+        "created_at": curr_time
+    }
+    voice_user_input = {
+        "voice_id": None,
+        "user_id": user_id,
+        "language": "en",
+        "is_public": "true",
+        "description": f"{user_id} (en)",
+        "created_at": curr_time 
+    }
     if response.status_code == 200:
-        storage.create_user(response.json())
-        storage.create_voice(response.json())
+        storage.create_user(create_user_input)
+        storage.create_voice(voice_user_input)
+        return response.json().get("user_id")
     else:
         return jsonify({"error": "Failed to clone voice", "status": response.status_code, "message": response.text}), response.status_code
     
@@ -83,6 +103,7 @@ def api_upload_audio_comm():
     user_id = request.form["user_id"]
     user = storage.get_user_by_id(user_id=user_id)
     voice_id = user.get_voiceid_from_lang(language)
+    #TODO create voice if not already existing
 
     # Create the translated version of the audio file in your voice
     tts_response = cartesia.text_to_speech(translation, voice_id, language)

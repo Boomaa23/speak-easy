@@ -1,6 +1,8 @@
 import os
 
 import dotenv
+dotenv.load_dotenv()
+
 import flask
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
@@ -9,7 +11,7 @@ from routes import api_blueprint
 from storage import db
 
 
-dotenv.load_dotenv()
+
 app = flask.Flask(__name__)
 CORS(app)
 

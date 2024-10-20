@@ -1,5 +1,5 @@
 import os
-
+import json
 import dotenv
 import requests
 
@@ -27,7 +27,8 @@ def text_to_speech(text, voice_id, language):
             },
             'language': language
         },
-        method='POST'
+        method='POST',
+        headers = _REQUEST_HEADERS
     )
 
 
@@ -36,14 +37,16 @@ def clone_voice(audio_bytes):
         '/voices/clone/clip',
         files={'clip': audio_bytes},
         data={'enhance': "true"},
-        method='POST'
-    ).content
+        method='POST',
+        headers = _REQUEST_HEADERS
+    )
 
 
 def localize_voice(voice_id, target_language):
     original_voice = _cartesia_request(
         f'/voices/get/{voice_id}',
-        method='GET'
+        method='GET',
+        headers = _REQUEST_HEADERS
     ).json()
 
     localized_embedding = _cartesia_request(
@@ -54,7 +57,8 @@ def localize_voice(voice_id, target_language):
             'original_speaker_gender': 'male',  # TODO auto-select for female speakers
             'dialect': 'us'
         },
-        method='POST'
+        method='POST',
+        headers = _REQUEST_HEADERS
     ).json()
 
     localized_voice = create_voice(original_voice['name'], target_language, original_voice['embedding'])
@@ -64,14 +68,19 @@ def localize_voice(voice_id, target_language):
 
 def create_voice(name, language, embedding):
     return _cartesia_request(
-        '/voices/create',
-        data={
+        '/voices',
+        data= json.dumps({
             'name': name,
             'description': f'{name} ({language})',
             'embedding': embedding,
             'language': language,
-        },
-        method='POST'
+        }),
+        method='POST',
+        headers = {
+            'Cartesia-Version': '2024-10-19',
+            'X-API-Key': os.getenv('CARTESIA_API_KEY'),
+            "Content-Type": "application/json"
+        }
     )
 
 
@@ -79,6 +88,5 @@ def _cartesia_request(endpoint, method='GET', **kwargs):
     return requests.request(
         method=method,
         url=f'https://api.cartesia.ai{endpoint}',
-        headers=_REQUEST_HEADERS,
         **kwargs
     )
