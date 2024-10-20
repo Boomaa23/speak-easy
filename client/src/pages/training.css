@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+/* Define a color theme using CSS variables */
+:root {
+    --primary-color: #2c2213;  /* Dark brown */
+    --secondary-color: #e6d6c3;  /* Light beige */
+    --tertiary-color: #d6c7b5;  /* Off-white for contrast */
+    --accent-color: #ec6666;  /* Red for recording status */
+    --hover-color: #522d12;  /* Darker brown for hover effects */
+    --disabled-color: #e2d0b8;  /* Light grey */
+    --ripple-opacity: 0.5;  /* Ripple transparency */
+}
+
+/* General page layout */
+.page-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Core text styling */
+.core-text {
+    font-size: 2rem;
+    line-height: 1.5;
+    width: 80%; /* Use a percentage width to allow more text per line */
+    max-width: 1200px; /* Cap the max width for very large screens */
+    margin-bottom: 30px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.core-text:hover {
+    transform: scale(1.0);
+}
+
+.highlight-bold {
+    font-weight: 700;
+}
+
+/* Microphone container */
+.mic-icon-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    cursor: pointer;
+    margin-top: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Microphone icon styling */
+.mic-icon {
+    font-size: 70px;
+    color: var(--primary-color);
+    transition: transform 0.3s ease;
+    position: absolute;
+    top: 35%;
+    left: 34%;
+    transform: translate(-50%, -50%); /* Centers the icon */
+}
+
+.mic-icon-container.recording .mic-icon {
+    animation: pulse 1.5s infinite;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.7;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Expanding ripple effect */
+.mic-icon-container.recording::before,
+.mic-icon-container.recording::after {
+    content: "";
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid grey;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: ripple 2s infinite;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.mic-icon-container.recording::after {
+    animation-delay: 1s;
+}
+
+/* Ripple animation */
+@keyframes ripple {
+    0% {
+        width: 80px;
+        height: 80px;
+        opacity: var(--ripple-opacity);
+    }
+    100% {
+        width: 200px;
+        height: 200px;
+        opacity: 0;
+    }
+}
+
+/* Hint text styling with smooth transition */
+.hint-text {
+    margin-top: 10px;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.hint-text.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Action buttons styling */
+.actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.action-btn {
+    font-size: 1.5rem;
+    padding: 15px 30px;
+    background-color: var(--tertiary-color);
+    color: var(--primary-color);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.3s;
+}
+
+.action-btn:hover {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    transform: scale(1.05);
+}
