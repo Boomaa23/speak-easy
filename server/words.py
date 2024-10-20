@@ -69,7 +69,7 @@ practice_words = { "en": {"words": english_words,
 }
 
 def practice_word(index=0, language='en'):
-    return practice_words[language]['words'][index]
+    return practice_words.get(language).get('words')[index]
 
 def practice_phrase(index=0, language='en'):
-    return practice_words[language]['phrases'][index]
+    return practice_words.get(language).get('phrases')[index]

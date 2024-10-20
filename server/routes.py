@@ -83,7 +83,7 @@ def api_upload_audio_learn():
     # Compare transcriptions and make suggestions
     diff = feedback.compare_transcriptions(correct_transcription, user_transcription)
     suggestions = feedback.generate_suggestions(diff)
-    return jsonify(suggestions)
+    return suggestions
 
 
 # Communication mode: retrieves the audio clip from the user and translates into the desired language
@@ -143,11 +143,11 @@ def api_upload_audio_comm():
 
 
 # Learning Mode: retrieves the next word to practice
-@api_blueprint.route('/api/nextword', methods=['GET'])
+@api_blueprint.route('/api/nextword', methods=['POST'])
 def api_get_next_word():
     global index_w
     i = index_w % 10
-    language = request.args.get('language', 'en')
+    language = request.form.get('language', 'en')
     index_w += 1
     result_word = words.practice_word(i, language)
     result_word_en = words.practice_word(i, 'en')
@@ -155,11 +155,12 @@ def api_get_next_word():
 
 
 # Learning Mode: retrieves the next phrase to practice
-@api_blueprint.route('/api/nextphrase', methods=['GET'])
+@api_blueprint.route('/api/nextphrase', methods=['POST'])
 def api_get_next_phrase():
     global index_p
     i = index_p % 10
-    language = request.args.get('language', 'en')
+    language = request.form.get('language', 'en')
+    print(f'language: {language}')
     index_p += 1
     result_phrase = words.practice_phrase(i, language)
     result_phrase_en = words.practice_phrase(i, 'en')
