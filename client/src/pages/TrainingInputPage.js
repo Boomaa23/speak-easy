@@ -64,7 +64,7 @@ const TrainingInputPage = () => {
       const formData = new FormData(); // Create FormData here
       formData.append('audio', audioBlob, 'audio.mp3');
       // Send audio to backend (example: using fetch)
-      const response = await fetch('http://localhost:5000/api/train', {
+      const response = await fetch('http://127.0.0.1:5000/api/train', {
         method: 'POST',
         body: formData
       });
@@ -73,9 +73,11 @@ const TrainingInputPage = () => {
         throw new Error(`Error: ${response.statusText}`);
       }
       const data = await response.json();  // Parse JSON response
-      console.log(data)
-      //user_id = data.get("user_id")
-      // Navigate to output page
+      
+      let user_id = data.user_id;
+
+      document.cookie = `user_id=${user_id}; path=/; expires=${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString()}`;
+
       navigate('/choosetool');
     }
   };

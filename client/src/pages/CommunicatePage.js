@@ -9,7 +9,7 @@ const CommunicatePage = () => {
   const [recorder, setRecorder] = useState(null);
   const [dots, setDots] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState('');
-  const [showLanguageSelection, setShowLanguageSelection] = useState(false);
+  const [showRecordingSection, setShowRecordingSection] = useState(false); // Change this to control the recording section
   const [playingAudio, setPlayingAudio] = useState(false);
   const [translatedAudioURL, setTranslatedAudioURL] = useState(''); // URL for translated audio
   const navigate = useNavigate();
@@ -75,6 +75,7 @@ const CommunicatePage = () => {
   // Function to handle language selection
   const handleLanguageSelect = (language) => {
     setSelectedLanguage(language);
+    setShowRecordingSection(true); // Show the recording section after language selection
   };
 
   // Function to play the translated audio
@@ -90,35 +91,10 @@ const CommunicatePage = () => {
     }
   };
 
-  // Function to show language selection after "Done" is pressed
-  const handleDone = () => {
-    setShowLanguageSelection(true);
-  };
-
   return (
     <div className="page-container">
-      <div className="core-text">
-        Let's talk to some foreigners! In your <span className="highlight-bold">native language</span>, 
-        record yourself saying what you want to translate.
-        <br />
-        <br />
-        Click the microphone icon to start recording:
-        <span className={`mic-icon ${isRecording ? 'recording' : ''}`} onClick={toggleRecording}>
-          <FaMicrophone size={30} />
-        </span>
-      </div>
-      {isRecording && (
-        <div className="recording-status">Recording{dots}</div>
-      )}
-      {audioURL && !isRecording && (
-        <div className="actions">
-          <button className="action-btn" onClick={toggleRecording}>Record Again</button>
-          <button className="action-btn done-btn" onClick={handleDone}>Done</button>
-        </div>
-      )}
-
       {/* Language Selection */}
-      {showLanguageSelection && (
+      {!selectedLanguage && (
         <>
           <div className="core-text">
             Which language would you like to speak in?
@@ -129,12 +105,36 @@ const CommunicatePage = () => {
                 key={lang} 
                 className={`language-btn ${selectedLanguage === lang ? 'selected' : ''}`} 
                 onClick={() => handleLanguageSelect(lang)}
-                disabled={selectedLanguage} // Disable if a language is already selected
               >
                 {lang}
               </button>
             ))}
           </div>
+        </>
+      )}
+
+      {/* Show recording section only after a language is selected */}
+      {showRecordingSection && (
+        <>
+          <div className="core-text">
+            Let's talk to some foreigners! In your <span className="highlight-bold">native language</span>, 
+            record yourself saying what you want to translate.
+            <br />
+            <br />
+            Click the microphone icon to start recording:
+            <span className={`mic-icon ${isRecording ? 'recording' : ''}`} onClick={toggleRecording}>
+              <FaMicrophone size={30} />
+            </span>
+          </div>
+
+          {isRecording && (
+            <div className="recording-status">Recording{dots}</div>
+          )}
+          {audioURL && !isRecording && (
+            <div className="actions">
+              <button className="action-btn" onClick={toggleRecording}>Record Again</button>
+            </div>
+          )}
 
           {/* Translated Text Section */}
           {translatedAudioURL && (
