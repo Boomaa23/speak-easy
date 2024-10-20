@@ -16,6 +16,15 @@ index_w = 0
 index_p = 0
 
 
+@api_blueprint.route('/api/user/speakslang', methods=['GET'])
+def api_user_speaks_lang():
+    user_id = request.args.get('user_id')
+    language = request.args.get('language')
+    user = storage.get_user_by_id(user_id=user_id)
+    speaks_lang = user.speaks_lang(language)
+    return speaks_lang
+
+
 # Both modes: trains the voice model
 @api_blueprint.route('/api/train', methods=['POST'])
 def api_train():
