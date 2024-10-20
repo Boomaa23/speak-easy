@@ -6,6 +6,7 @@ import cartesia
 import feedback
 import uuid
 import time
+import json
 import storage 
 from googletrans import Translator
 from flask import make_response, send_file, request, jsonify
@@ -35,23 +36,24 @@ def api_train():
     embedding_resp = cartesia.clone_voice(audio.read())
     embedding = embedding_resp.json().get("embedding")
     user_id = uuid.uuid4().hex
+    print(user_id)
     response = cartesia.create_voice(user_id, "en", embedding)
-    print(response)
-    #print(response.content)
+    print(json.loads(response.content))
+    voice_id = json.loads(response.content).get("id")
     curr_time = time.time()
     create_user_input = {
         "user_id": user_id,
         "created_at": curr_time
     }
     voice_user_input = {
-        "voice_id": None,
+        "voice_id": voice_id,
         "user_id": user_id,
         "language": "en",
         "is_public": "true",
         "description": f"{user_id} (en)",
         "created_at": curr_time 
     }
-    if response.status_code == 200:
+    if 200 <= response.status_code < 300:
         storage.create_user(create_user_input)
         storage.create_voice(voice_user_input)
         return response.json().get("user_id")
