@@ -40,6 +40,14 @@ class User(db.Model):
         db.session.delete(self)  # Delete the user
         db.session.commit()
 
+    def get_voiceid_from_lang(self, lang):
+        if self.speaks_lang(lang=lang):
+            for voice in self.voices:
+                if voice.language == lang:
+                        return voice.id
+        return None
+    
+                
 
 class VoiceModel(db.Model):
     """
