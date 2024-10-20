@@ -4,6 +4,7 @@
 :root {
     --primary-color: #2c2213;  /* Dark brown */
     --secondary-color: #e6d6c3;  /* Light beige */
+    --tertiary-color: #d6c7b5;  /* Off-white for contrast */
     --accent-color: #ec6666;  /* Red for recording status */
     --hover-color: #522d12;  /* Darker brown for hover effects */
     --disabled-color: #e2d0b8;  /* Light grey */
@@ -11,22 +12,28 @@
     --ripple-opacity: 0.5;  /* Ripple transparency */
 }
 
+/* General layout */
 .page-container {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
     background-color: var(--secondary-color);
     color: var(--primary-color);
-    font-family: "Inter", sans-serif;
+    font-family: 'Inter', sans-serif;
     text-align: center;
-    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
+/* Core text */
 .core-text {
-    font-size: 2.5rem;
+    font-size: 2rem;
     line-height: 1.5;
-    max-width: 80%;
+    max-width: 600px;
+    margin-bottom: 30px;
+    color: var(--primary-color);
     transition: transform 0.2s ease-in-out;
 }
 
@@ -38,48 +45,54 @@
     font-weight: 700;
 }
 
-.hover-highlight {
-    cursor: pointer;
-    border-radius: 10px;
-    padding: 0 5px;
-    transition: background-color 0.3s, color 0.3s, transform 0.2s;
-}
-
-.hover-highlight:hover {
-    background-color: var(--primary-color);
-    color: var(--secondary-color);
-    transform: scale(1.1);
-    border-radius: 15px;
-}
-
-/* Microphone icon with pulsating rings */
-.mic-icon-container {
-    display: inline-block;
-    position: relative;
-    cursor: pointer;
+/* Microphone icon and container */
+.mic-container1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
     margin-top: 20px;
+}
+
+.mic-icon1-container {
+    position: relative;
     width: 120px;
     height: 120px;
+    cursor: pointer;
 }
 
-.mic-icon {
-    color: var(--primary-color);
+.mic-icon1 {
     font-size: 80px;
-    transition: transform 0.3s;
+    color: var(--primary-color);
     position: absolute;
-    top: 50%;
+    top: 55%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2;
+    transform: translate(-50%, -95%);
+    transition: transform 0.3s ease;
 }
 
-.recording .mic-icon {
-    animation: pulse 1.5s infinite;
+.mic-icon1.recording {
+    animation: pulse 2s infinite;
 }
 
-/* Expanding ripple effect */
-.recording .mic-icon-container::before,
-.recording .mic-icon-container::after {
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Ripple effect */
+.mic-icon-container.recording::before,
+.mic-icon-container.recording::after {
     content: "";
     position: absolute;
     top: 50%;
@@ -91,29 +104,13 @@
     transform: translate(-50%, -50%);
     animation: ripple 2s infinite;
     opacity: 0;
+    pointer-events: none;
 }
 
-.recording .mic-icon-container::after {
+.mic-icon-container.recording::after {
     animation-delay: 1s;
 }
 
-/* Pulse animation */
-@keyframes pulse {
-    0% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: translate(-50%, -50%) scale(1.2);
-        opacity: 0.3;
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-    }
-}
-
-/* Ripple animation for waves */
 @keyframes ripple {
     0% {
         width: 80px;
@@ -127,12 +124,55 @@
     }
 }
 
-.recording-status {
+/* Hint text */
+.hint-text {
+    margin-top: 10px;
     font-size: 1.5rem;
     color: var(--accent-color);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.hint-text.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Language buttons */
+.language-buttons {
     margin-top: 20px;
 }
 
+.language-btn {
+    font-size: 1.5rem;
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: var(--tertiary-color);
+    color: var(--primary-color);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
+}
+
+.language-btn:hover {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    transform: scale(1.1);
+}
+
+.language-btn.selected {
+    background-color: var(--hover-color);
+    color: white;
+}
+
+.language-btn:disabled {
+    background-color: var(--disabled-color);
+    cursor: not-allowed;
+}
+
+/* Action buttons */
 .actions {
     margin-top: 30px;
     display: flex;
@@ -158,6 +198,7 @@
     transform: scale(1.1);
 }
 
+/* Play icon */
 .play-icon {
     cursor: pointer;
     transition: color 0.3s;
@@ -173,42 +214,12 @@
     margin-top: 10px;
 }
 
+/* Translated audio section */
 .translated-audio {
     margin-top: 20px;
 }
 
-.language-btn {
-    font-size: 1.5rem;
-    margin: 10px;
-    padding: 10px 20px;
-    background-color: var(--secondary-color);
-    color: var(--primary-color);
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s, transform 0.2s;
-}
-
-.language-btn:hover {
-    background-color: var(--primary-color);
-    color: var(--secondary-color);
-    transform: scale(1.1);
-}
-
-.language-btn.selected {
-    background-color: var(--hover-color);
-    color: white;
-}
-
-.language-btn:disabled {
-    background-color: var(--disabled-color);
-    cursor: not-allowed;
-}
-
-.language-buttons {
-    margin-top: 20px;
-}
-
+/* Fade-in/out effect */
 .fade-in-out {
     transition: opacity 0.8s ease-in-out;
     opacity: 1;
