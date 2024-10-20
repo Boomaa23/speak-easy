@@ -1,3 +1,5 @@
+import os
+
 import dotenv
 import flask
 from flask_cors import CORS
@@ -11,7 +13,7 @@ dotenv.load_dotenv()
 app = flask.Flask(__name__)
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'db.db'  # In-memory DB
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.getcwd()}/db.db'  # In-memory DB
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
