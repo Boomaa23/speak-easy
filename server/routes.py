@@ -34,7 +34,9 @@ def api_train():
         return jsonify({'error': 'No audio file provided'}), 400
     audio = request.files['audio']
     embedding_resp = cartesia.clone_voice(audio.read())
-    embedding = embedding_resp.json().get("embedding")
+    print(embedding_resp.content)
+    embedding = json.loads(embedding_resp.content).get("embedding")
+    #embedding = embedding_resp.json().get("embedding")
     user_id = uuid.uuid4().hex
     #print(user_id)
     response = cartesia.create_voice(user_id, "en", embedding)
