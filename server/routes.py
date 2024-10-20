@@ -36,9 +36,9 @@ def api_train():
     embedding_resp = cartesia.clone_voice(audio.read())
     embedding = embedding_resp.json().get("embedding")
     user_id = uuid.uuid4().hex
-    print(user_id)
+    #print(user_id)
     response = cartesia.create_voice(user_id, "en", embedding)
-    print(json.loads(response.content))
+    #print(json.loads(response.content))
     voice_id = json.loads(response.content).get("id")
     is_public = json.loads(response.content).get("is_public")
     curr_time = datetime.now()
@@ -57,7 +57,7 @@ def api_train():
     if 200 <= response.status_code < 300:
         storage.create_user(create_user_input)
         storage.create_voice(voice_user_input)
-        return response.json().get("user_id")
+        return {"user_id": response.json().get("user_id")}
     else:
         return jsonify({"error": "Failed to clone voice", "status": response.status_code, "message": response.text}), response.status_code
     
