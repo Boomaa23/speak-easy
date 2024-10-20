@@ -1,6 +1,6 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { getCookie } from '../cookieUtils.js'; // Assuming you have a utility to get cookies
-import { FaMicrophone, FaPlay } from 'react-icons/fa'; // Import microphone and play button icons
+import { FaMicrophone } from 'react-icons/fa'; // Import microphone icon
 import './pages.css'; // Import the custom styles
 
 const PracticeLangPage = () => {
@@ -9,30 +9,25 @@ const PracticeLangPage = () => {
   const [foreignphrase, setFPhrase] = useState('');
   const [englishphrase, setEPhrase] = useState('');
   const [exampleAudioUrl, setExAudioUrl] = useState('');
-  const [isVisible, setIsVisible] = useState(true); 
+  const [isVisible, setIsVisible] = useState(true);
   const [audioUrl, setAudioUrl] = useState('');
   const [feedback, setFeedback] = useState('');
   const [exAudioPlayed, setExAudioPlayed] = useState(false);
-  // const [playingAudio, setPlayingAudio] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const practiceRef = useRef(null); // Create a ref to scroll to
   const [recorder, setRecorder] = useState(null);
 
   const handleLanguageSelect = async (lang) => {
     setLanguage(lang);
-    if (lang === 'Spanish') {
-      setLangCode('es');
-    }
-    if (lang === 'French') {
-      setLangCode('fr');
-    }
+    const newLangCode = lang === 'Spanish' ? 'es' : 'fr'; // Set langCode for use later
+    setLangCode(newLangCode);
 
     // Fetch the phrase and audio clip from the backend
     try {
-      const formData = new FormData(); // Create FormData here
+      const formData = new FormData();
+      formData.append('language', newLangCode); // Use newLangCode immediately
 
-      formData.append('language', langCode);
-      console.log("getting next phrase")
+      console.log("getting next phrase");
       const response = await fetch('http://localhost:5000/api/nextphrase', {
         method: 'POST',
         body: formData,
@@ -41,24 +36,10 @@ const PracticeLangPage = () => {
       const data = await response.json();
       setFPhrase(data.phrase); // Assuming the API response contains a 'phrase'
       setEPhrase(data.phrase_en);
-      console.log("retrieved next phrase")
+      console.log("retrieved next phrase");
 
-      const formData2 = new FormData();
-      const user_id = getCookie("user_id"); // Corrected cookie retrieval
-      formData2.append('user_id', user_id);
-      formData2.append('language', langCode);
-      formData2.append('words', foreignphrase);
-      console.log("getting example speech")
-      const speak_response = await fetch('http://localhost:5000/api/speak', {
-        method: 'POST',
-        body: formData2,
-      });
-
-      const AudioBlob = await speak_response.blob();  // Get the audio as a Blob
-      const AudioURL = URL.createObjectURL(AudioBlob);  // Create an object URL
-      setExAudioUrl(AudioURL);  // Set the URL so it can be played
-      console.log(AudioURL)
-      console.log("retrieved example speech")
+      // After setting the phrases, we can call the next fetch
+      await fetchExampleSpeech(newLangCode, data.phrase); // Call new function to fetch example audio
 
       // Check if the practiceRef is defined before scrolling
       if (practiceRef.current) {
@@ -69,14 +50,31 @@ const PracticeLangPage = () => {
     }
   };
 
+  // Function to fetch example speech using the updated foreignphrase
+  const fetchExampleSpeech = async (langCode, foreignphrase) => {
+    const formData2 = new FormData();
+    const user_id = getCookie("user_id"); // Corrected cookie retrieval
+    formData2.append('user_id', user_id);
+    formData2.append('language', langCode);
+    formData2.append('words', foreignphrase); // Use the latest foreignphrase
+
+    console.log("getting example speech");
+    const speak_response = await fetch('http://localhost:5000/api/speak', {
+      method: 'POST',
+      body: formData2,
+    });
+
+    const AudioBlob = await speak_response.blob();  // Get the audio as a Blob
+    const AudioURL = URL.createObjectURL(AudioBlob);  // Create an object URL
+    setExAudioUrl(AudioURL);  // Set the URL so it can be played
+    console.log(AudioURL);
+    console.log("retrieved example speech");
+  };
+
   const handlePlayAudio = () => {
     if (exampleAudioUrl) {
       const audio = new Audio(exampleAudioUrl);
-      // setPlayingAudio(true);
       audio.play();
-      // audio.onended = () => {
-      //   setPlayingAudio(false); // Reset when audio finishes
-      // };
       setExAudioPlayed(true);
     }
   };
@@ -86,7 +84,7 @@ const PracticeLangPage = () => {
     if (isRecording) {
       // Stop recording
       recorder.stop();
-      
+
       const audio_response = await fetch(audioUrl);
       const audioBlob = await audio_response.blob(); // Get the audio file as a Blob
       const formData = new FormData();
@@ -97,7 +95,7 @@ const PracticeLangPage = () => {
         body: formData,
       });
 
-      setFeedback(response.json());
+      setFeedback(await response.json()); // Await the response.json()
       setIsRecording(false);
     } else {
       // Start recording
@@ -145,17 +143,16 @@ const PracticeLangPage = () => {
           {exampleAudioUrl && (
             <div>
               <h3>Alright, let's practice some {language} pronunciation.</h3>
-              Try to say "{englishphrase}" in {language}: <br></br> {foreignphrase} 
-              <br></br>
+              Try to say "{englishphrase}" in {language}: <br /> {foreignphrase}
+              <br />
               <span>Here's how you should sound: </span>
               <button className="play-button" onClick={handlePlayAudio}>Play</button>
             </div>
           )}
           {exAudioPlayed && (
             <div>
-              Now it's your turn: 
-              <b>
-              </b>
+              Now it's your turn:
+              <b></b>
               Click the microphone icon to start recording:
               <span className={`mic-icon ${isRecording ? 'recording' : ''}`} onClick={toggleRecording}>
                 <FaMicrophone size={30} />
