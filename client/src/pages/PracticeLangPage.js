@@ -121,6 +121,7 @@ const PracticeLangPage = () => {
         const formData = new FormData(); // Create FormData here
         // const user_id = getCookie("user_id"); // Corrected cookie retrieval
         formData.append('audio', audioBlob, 'audio.mp3');
+        formData.append("foreign_text", foreignphrase);
         // formData.append('user_id', user_id);
         // formData.append('language', selectedLanguage);
         // console.log("1")
@@ -177,7 +178,9 @@ const PracticeLangPage = () => {
                   Try to say "{englishphrase}" in {language}: <br /> {foreignphrase}
                   <br />
                   <span>Here's how you should sound: </span>
-                  <button className="play-button" onClick={handlePlayAudio}>Play</button>
+                  <div className="actions">
+                  <button className="action-btn" onClick={handlePlayAudio}>Play</button>
+                  </div>
                 </div>
               )}
               {exAudioPlayed && (
@@ -196,7 +199,7 @@ const PracticeLangPage = () => {
               </div>
               )}
               {isFeedback && (
-                <div>
+                <div style={{ fontSize: '20px' }}>
                 Here's how you did: {feedback}
               </div>
               )}
