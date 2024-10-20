@@ -98,7 +98,7 @@ const CommunicatePage = () => {
   return (
     <div className="page-container">
       <div className="core-text">
-        Let's talk to some foreigners! In your <span className="highlight-bold">native language</span>, 
+        Let's talk in another language! In your <span className="highlight-bold">native language</span>, 
         record yourself saying what you want to translate.
         <br />
         <br />
