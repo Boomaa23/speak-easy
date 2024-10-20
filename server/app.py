@@ -39,3 +39,5 @@ def handle_exception(e):
     )
     response.content_type = 'application/json'
     return response
+
+#TODO: ADD DB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
