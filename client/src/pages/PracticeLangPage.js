@@ -124,20 +124,23 @@ const PracticeLangPage = () => {
 
   return (
     <div className="page-container">
-      <div className="core-text">
-        Cool, let's practice some pronunciation! What language are you trying to learn?
-        <br />
-        <br />
-        {/* Language buttons */}
-        <button className="language-btn" onClick={() => handleLanguageSelect('Spanish')}>
-          ES
-        </button>
-        <button className="language-btn" onClick={() => handleLanguageSelect('French')}>
-          FR
-        </button>
-      </div>
+      {/* Conditional rendering for the language selection prompt */}
+      {!language && (
+        <div className="core-text">
+          Cool, let's practice some pronunciation! What language are you trying to learn?
+          <br />
+          <br />
+          {/* Language buttons */}
+          <button className="language-btn" onClick={() => handleLanguageSelect('Spanish')}>
+            ES
+          </button>
+          <button className="language-btn" onClick={() => handleLanguageSelect('French')}>
+            FR
+          </button>
+        </div>
+      )}
 
-      {/* New text section */}
+      {/* New text section that appears after a language is selected */}
       {language && (
         <div ref={practiceRef} className="core-text">
           {exampleAudioUrl && (
