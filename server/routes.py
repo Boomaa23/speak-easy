@@ -73,8 +73,9 @@ def api_upload_audio_learn():
     audio = request.files['audio']
 
     # Save and transcribe the audio file
-    audio.save('last_try.mp3')
-    user_transcription = feedback.transcribe_audio('last_try.mp3')
+    user_audio_path = os.path.join(os.path.expanduser('~'), 'last_try_learn.mp3')
+    audio.save(user_audio_path)
+    user_transcription = feedback.transcribe_audio(user_audio_path)
 
     # Retrieve and transcribe the example audio file
     correct_audio_path = "audio_phrase_learn.mp3"

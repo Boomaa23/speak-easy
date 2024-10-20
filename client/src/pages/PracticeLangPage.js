@@ -14,6 +14,7 @@ const PracticeLangPage = () => {
   const [feedback, setFeedback] = useState('');
   const [exAudioPlayed, setExAudioPlayed] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [isFeedback, setIsFeedback] = useState(false);
   const practiceRef = useRef(null); // Create a ref to scroll to
   const [recorder, setRecorder] = useState(null);
 
@@ -86,18 +87,6 @@ const PracticeLangPage = () => {
     if (isRecording) {
       // Stop recording
       recorder.stop();
-
-      const audio_response = await fetch(audioUrl);
-      const audioBlob = await audio_response.blob(); // Get the audio file as a Blob
-      const formData = new FormData();
-      formData.append('audio', audioBlob, 'audio.mp3');
-
-      const response = await fetch('http://localhost:5000/api/upload_get_feedback', {
-        method: 'POST',
-        body: formData,
-      });
-
-      setFeedback(await response.json()); // Await the response.json()
       setIsRecording(false);
     } else {
       // Start recording
@@ -123,6 +112,39 @@ const PracticeLangPage = () => {
       }
     }
   };
+  
+  const GetFeedback = async () => {
+    if (audioUrl) {
+      try {
+        const audio_response = await fetch(audioUrl);
+        const audioBlob = await audio_response.blob(); // Get the audio file as a Blob
+        const formData = new FormData(); // Create FormData here
+        // const user_id = getCookie("user_id"); // Corrected cookie retrieval
+        formData.append('audio', audioBlob, 'audio.mp3');
+        // formData.append('user_id', user_id);
+        // formData.append('language', selectedLanguage);
+        // console.log("1")
+
+        // Send audio to backend
+        const response = await fetch('http://localhost:5000/api/upload_get_feedback', {
+          method: 'POST',
+          body: formData,
+        });
+        //console.log("2")
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+
+        const responseData = await response.json(); // Convert the response to a JavaScript object
+        setFeedback(responseData.feedback);
+        setIsFeedback(true);
+
+      } catch (error) {
+        console.error("Error during translation process:", error);
+      }
+    }
+  }
 
   return (
     <div className="page-container">
@@ -169,9 +191,14 @@ const PracticeLangPage = () => {
                 </div>
               )}
               {audioUrl && !isRecording && (
+                <div className="actions">
+                <button className="action-btn" onClick={GetFeedback}>Show Feedback</button>
+              </div>
+              )}
+              {isFeedback && (
                 <div>
-                  Here's how you did: {feedback}
-                </div>
+                Here's how you did: {feedback}
+              </div>
               )}
             </>
           )}
