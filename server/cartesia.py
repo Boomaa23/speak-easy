@@ -1,10 +1,12 @@
 import os
 import requests
 
+
 _REQUEST_HEADERS = {
     'Cartesia-Version': '2024-10-19',
     'X-API-Key': os.getenv('CARTESIA_API_KEY'),
 }
+
 
 def text_to_speech(text, voice_id, language):
     return _cartesia_request(
@@ -25,6 +27,7 @@ def text_to_speech(text, voice_id, language):
         },
         method='POST'
     )
+
 
 def clone_voice(audio_pcm):
     return _cartesia_request(

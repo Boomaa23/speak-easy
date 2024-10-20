@@ -6,6 +6,7 @@ import cartesia
 import io
 import os
 from flask import make_response, send_file
+from feedback import transcribe_audio, compare_transcriptions, generate_suggestions
 
 UPLOAD_FOLDER = 'test'
 api_blueprint = flask.Blueprint('api', __name__)
@@ -40,7 +41,7 @@ def api_get_next_word():
     i = index_w % 10
     language = request.args.get('language', 'en')
     index_w += 1
-    return words.practice_word(i, language)
+    return jsonify(words.practice_word(i, language))
 
 @api_blueprint.route('/api/nextphrase', methods=['GET'])
 def api_get_next_phrase():
@@ -48,7 +49,7 @@ def api_get_next_phrase():
     i = index_p % 10
     language = request.args.get('language', 'en')
     index_p += 1
-    return words.practice_phrase(i, language)
+    return jsonify(words.practice_phrase(i, language))
 
 @api_blueprint.route('/api/speak', methods=['GET'])
 def api_speak():
@@ -62,4 +63,15 @@ def api_speak():
         return response
     else:
         return jsonify({"error": "Failed to generate audio", "status": response.status_code, "message": response.text}), response.status_code
-    
+
+@api_blueprint.route('/api/feedback', methods=['GET'])
+def api_feedback():
+    #TODO insert audio files
+    user_audio_path = None
+    correct_audio_path = None
+    user_transcription = transcribe_audio(user_audio_path)
+    correct_transcription = transcribe_audio(correct_audio_path)
+    diff = compare_transcriptions(correct_transcription, user_transcription)
+    suggestions = generate_suggestions(diff)
+    return jsonify(suggestions)
+
