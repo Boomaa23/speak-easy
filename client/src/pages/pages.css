@@ -123,4 +123,14 @@ transition: color 0.3s ease;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+
+.fade-in-out {
+    transition: opacity 0.5s ease-in-out;
+    opacity: 1;
+  }
+  
+  .fade-in-out.hidden {
+    opacity: 0;
+  }
+  
   
