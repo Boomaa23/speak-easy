@@ -16,6 +16,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
+# Create all database tables within the app context
+with app.app_context():
+    db.create_all()
+
 app.register_blueprint(api_blueprint)
 
 
