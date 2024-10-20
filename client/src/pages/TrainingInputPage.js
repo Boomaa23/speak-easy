@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './pages.css';
+import './training.css';
 import { FaMicrophone } from 'react-icons/fa';
 
 const TrainingInputPage = () => {
