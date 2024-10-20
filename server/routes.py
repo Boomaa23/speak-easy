@@ -5,7 +5,7 @@ import os
 import cartesia
 import feedback
 import uuid
-import time
+from datetime import datetime
 import json
 import storage 
 from googletrans import Translator
@@ -40,7 +40,8 @@ def api_train():
     response = cartesia.create_voice(user_id, "en", embedding)
     print(json.loads(response.content))
     voice_id = json.loads(response.content).get("id")
-    curr_time = time.time()
+    is_public = json.loads(response.content).get("is_public")
+    curr_time = datetime.now()
     create_user_input = {
         "user_id": user_id,
         "created_at": curr_time
@@ -49,7 +50,7 @@ def api_train():
         "voice_id": voice_id,
         "user_id": user_id,
         "language": "en",
-        "is_public": "true",
+        "is_public": is_public,
         "description": f"{user_id} (en)",
         "created_at": curr_time 
     }
