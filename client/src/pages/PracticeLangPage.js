@@ -185,12 +185,14 @@ const PracticeLangPage = () => {
               )}
               {exAudioPlayed && (
                 <div>
-                  Now it's your turn!
-                  <b></b>
-                  Click the microphone icon to start recording:
-                  <span className={`mic-icon ${isRecording ? 'recording' : ''}`} onClick={toggleRecording}>
+                Now it's your turn!
+                <b></b>
+                <div>
+                  <span>Click the microphone icon to start recording:</span>
+                  <span className={`mic-icon-2 ${isRecording ? 'recording' : ''}`} onClick={toggleRecording}>
                     <FaMicrophone size={30} />
                   </span>
+                </div>
                 </div>
               )}
               {audioUrl && !isRecording && (
