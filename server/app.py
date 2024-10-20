@@ -1,14 +1,26 @@
+import os
+
 import dotenv
 import flask
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 
 from routes import api_blueprint
+from storage import db
 
 
 dotenv.load_dotenv()
 app = flask.Flask(__name__)
 CORS(app)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.getcwd()}/db.db'  # In-memory DB
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db.init_app(app)
+
+# Create all database tables within the app context
+with app.app_context():
+    db.create_all()
 
 app.register_blueprint(api_blueprint)
 
