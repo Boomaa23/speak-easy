@@ -1,7 +1,9 @@
 import os
+
+import dotenv
 import requests
 
-
+dotenv.load_dotenv()
 _REQUEST_HEADERS = {
     'Cartesia-Version': '2024-10-19',
     'X-API-Key': os.getenv('CARTESIA_API_KEY'),
@@ -11,7 +13,7 @@ _REQUEST_HEADERS = {
 def text_to_speech(text, voice_id, language):
     return _cartesia_request(
         '/tts/bytes',
-        payload={
+        data={
             'model_id': ('sonic-english' if language == 'en' else 'sonic-multilingual'),
             'transcript': text,
             'voice': {
@@ -29,13 +31,14 @@ def text_to_speech(text, voice_id, language):
     )
 
 
-def clone_voice(audio_pcm):
+def clone_voice(audio_bytes):
     return _cartesia_request(
         '/voices/clone/clip',
-        files=audio_pcm,
-        payload={'enhance': True},
-        method='GET'
-    )
+        files={'clip': audio_bytes},
+        data={'enhance': "true"},
+        method='POST'
+    ).content
+
 
 def localize_voice(voice_id, target_language):
     original_voice = _cartesia_request(
@@ -45,7 +48,7 @@ def localize_voice(voice_id, target_language):
 
     localized_embedding = _cartesia_request(
         '/voices/localize',
-        payload={
+        data={
             'embedding': original_voice['embedding'],
             'language': target_language,
             'original_speaker_gender': 'male',  # TODO auto-select for female speakers
@@ -56,7 +59,7 @@ def localize_voice(voice_id, target_language):
 
     localized_voice = _cartesia_request(
         '/voices/create',
-        payload={
+        data={
             'name': original_voice['name'],
             'description': f'{original_voice["name"]} (localized to {target_language})',
             'embedding': localized_embedding['embedding'],
@@ -68,11 +71,10 @@ def localize_voice(voice_id, target_language):
     return localized_voice
 
 
-def _cartesia_request(endpoint, files=None, payload=None, method='GET'):
+def _cartesia_request(endpoint, method='GET', **kwargs):
     return requests.request(
         method=method,
         url=f'https://api.cartesia.ai{endpoint}',
         headers=_REQUEST_HEADERS,
-        files=files,
-        data=payload,
+        **kwargs
     )

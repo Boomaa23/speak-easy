@@ -4,4 +4,3 @@ werkzeug==3.0.3
 Flask-SQLAlchemy==3.0.4
 python-dotenv==1.0.0
 requests==2.32.3
-ffmpeg-python==0.2.0

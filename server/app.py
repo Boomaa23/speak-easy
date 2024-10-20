@@ -1,4 +1,3 @@
-import common
 import dotenv
 import flask
 from flask_cors import CORS
@@ -29,7 +28,7 @@ def handle_exception(e):
     response = e.get_response()
     # Replace the body with JSON
     response.data = flask.json.dumps(
-        common.create_response(
+        flask.jsonify(
             e.code,
             {
                 'name': e.name,
