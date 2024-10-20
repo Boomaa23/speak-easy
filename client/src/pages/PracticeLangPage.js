@@ -1,15 +1,35 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import './pages.css'; // Import the custom styles
 
 const PracticeLangPage = () => {
-  const [language, setLanguage] = React.useState('');
+  const [language, setLanguage] = useState('');
+  const [phrase, setPhrase] = useState('');
+  const [audioUrl, setAudioUrl] = useState('');
   const practiceRef = useRef(null); // Create a ref to scroll to
 
-  const handleLanguageSelect = (lang) => {
+  const handleLanguageSelect = async (lang) => {
     setLanguage(lang);
-    // Check if the practiceRef is defined before scrolling
-    if (practiceRef.current) {
-      practiceRef.current.scrollIntoView({ behavior: 'smooth' });
+
+    // Fetch the phrase and audio clip from the backend
+    try {
+      const response = await fetch(`your-backend-endpoint/${lang}`); // Adjust the endpoint as needed
+      const data = await response.json();
+      setPhrase(data.phrase); // Assuming the API response contains a 'phrase'
+      setAudioUrl(data.audioUrl); // Assuming the API response contains an 'audioUrl'
+      
+      // Check if the practiceRef is defined before scrolling
+      if (practiceRef.current) {
+        practiceRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handlePlayAudio = () => {
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
+      audio.play();
     }
   };
 
@@ -21,7 +41,7 @@ const PracticeLangPage = () => {
         <br />
         {/* Language buttons */}
         <button className="language-btn" onClick={() => handleLanguageSelect('Spanish')}>
-          EN
+          ES
         </button>
         <button className="language-btn" onClick={() => handleLanguageSelect('French')}>
           FR
@@ -32,6 +52,13 @@ const PracticeLangPage = () => {
       {language && (
         <div ref={practiceRef} className="core-text">
           <h3>Alright, let's practice some {language} pronunciation.</h3>
+          <p>{phrase}</p>
+          {audioUrl && (
+            <div>
+              <span>Here's how you should sound: </span>
+              <button className="play-button" onClick={handlePlayAudio}>Play</button>
+            </div>
+          )}
         </div>
       )}
     </div>
