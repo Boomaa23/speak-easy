@@ -61,7 +61,7 @@ def localize_voice(voice_id, target_language):
         headers = _REQUEST_HEADERS
     ).json()
 
-    localized_voice = create_voice(original_voice['name'], target_language, original_voice['embedding'])
+    localized_voice = create_voice(original_voice['name'], target_language, localized_embedding['embedding'])
 
     return localized_voice
 

@@ -91,7 +91,7 @@ def api_upload_audio_comm():
     if 'audio' not in request.files:
         return jsonify({'error': 'No audio file provided'}), 400
     audio = request.files['audio']
-    language = request.args.get('language', 'en')
+    language = request.form.get('language', 'en')
 
     # Save and transcribe the audio file
     user_audio_path = os.path.join(os.path.expanduser('~'), 'last_try.mp3')
@@ -105,8 +105,28 @@ def api_upload_audio_comm():
     # Retrieve the voice id of the user for the desired language
     user_id = request.form["user_id"]
     user = storage.get_user_by_id(user_id=user_id)
-    voice_id = user.get_voiceid_from_lang(language)
-    #TODO create voice if not already existing
+    if (user.speaks_lang(language)):
+        voice_id = user.get_voiceid_from_lang(language)
+    else:
+        # FUTURE TODO: When we support training on languages other than 
+        # English, change this logic to support taking base 
+        # voiceids from other languages as well
+        base_voice_id = user.get_voiceid_from_lang("en")
+        response = cartesia.localize_voice(base_voice_id, language)
+        
+        # Construct input for saving this in voice db
+        voice_id = json.loads(response.content).get("id")
+        is_public = json.loads(response.content).get("is_public")
+        curr_time = datetime.now()
+        voice_user_input = {
+            "voice_id": voice_id,
+            "user_id": user_id,
+            "language": "en",
+            "is_public": is_public,
+            "description": f"{user_id} (en)",
+            "created_at": curr_time 
+        }
+        storage.create_voice(voice_user_input)
 
     # Create the translated version of the audio file in your voice
     tts_response = cartesia.text_to_speech(translation, voice_id, language)
