@@ -138,7 +138,7 @@ def api_upload_audio_comm():
     #print(tts_response.content)
     with open ('audio_result.mp3', 'wb') as f:
         f.write(tts_response.content)
-    return tts_response
+    return send_file('audio_result.mp3',  mimetype='audio/mpeg')
 
 
 # Learning Mode: retrieves the next word to practice
