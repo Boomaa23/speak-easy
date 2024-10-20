@@ -5,7 +5,7 @@ import os
 import cartesia
 import feedback
 
-from storage import create_user, create_voice
+import storage 
 from googletrans import Translator
 from flask import make_response, send_file, request, jsonify
 
@@ -24,8 +24,8 @@ def api_train():
     audio = request.files['audio']
     response = cartesia.clone_voice(audio)
     if response.status_code == 200:
-        create_user(response.json())
-        create_voice(response.json())
+        storage.create_user(response.json())
+        storage.create_voice(response.json())
     else:
         return jsonify({"error": "Failed to clone voice", "status": response.status_code, "message": response.text}), response.status_code
     
@@ -71,12 +71,12 @@ def api_upload_audio_comm():
     translation = translator.translate(user_transcription, dest=language)
 
     # Retrieve the voice id of the user for the desired language
-    # TODO get user id from frontend to get voiceid from storage
-    user_id = None
-    voice_id = None
+    user_id = request.form["user_id"]
+    user = storage.get_user_by_id(user_id=user_id)
+    voice_id = user.get_voiceid_from_lang(language)
 
     # Create the translated version of the audio file in your voice
-    tts_response = text_to_speech(translation, voice_id, language)
+    tts_response = cartesia.text_to_speech(translation, voice_id, language)
     return tts_response
 
 
@@ -101,12 +101,13 @@ def api_get_next_phrase():
 
 
 # Learning Mode: Stores and returns a given phrase in a given language
-@api_blueprint.route('/api/speak', methods=['GET'])
+@api_blueprint.route('/api/speak', methods=['POST'])
 def api_speak():
-    language = request.args.get('language', 'en')
-    words = request.args.get('words', 'Hello World')
-    # TODO get user ID from frontend to get voice id from storage
-    voice_id = None  
+    language = request.form.get('language', 'en')
+    words = request.form.get('words', 'Hello World')
+    user_id = request.form.get("user_id")
+    user = storage.get_user_by_id(user_id=user_id)
+    voice_id = user.get_voiceid_from_lang(language) 
     response = cartesia.text_to_speech(words, voice_id, language)
 
     if response.status_code == 200:
