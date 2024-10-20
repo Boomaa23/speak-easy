@@ -56,20 +56,28 @@ const TrainingInputPage = () => {
   };
 
   // Handle navigation to the next page and sending data to backend
-  const handleNext = () => {
-    // if (audioURL) {
-    //   // Send audio to backend (example: using fetch)
-    //   fetch('your-backend-endpoint', {
-    //     method: 'POST',
-    //     body: JSON.stringify({ audio: audioURL }),
-    //     headers: { 'Content-Type': 'application/json' },
-    //   });
+  const handleNext = async () => {
+    if (audioURL) {
+      const audio_response = await fetch(audioURL);
+      const audioBlob = await audio_response.blob(); // Get the audio file as a Blob
 
-    //   // Navigate to output page
-    //   navigate('/output');
-    // }
-
-    navigate('/choosetool');
+      const formData = new FormData(); // Create FormData here
+      formData.append('audio', audioBlob, 'audio.mp3');
+      // Send audio to backend (example: using fetch)
+      const response = await fetch('http://localhost:5000/api/train', {
+        method: 'POST',
+        body: formData
+      });
+      // Check if request was successful
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+      const data = await response.json();  // Parse JSON response
+      console.log(data)
+      //user_id = data.get("user_id")
+      // Navigate to output page
+      navigate('/choosetool');
+    }
   };
 
   return (
