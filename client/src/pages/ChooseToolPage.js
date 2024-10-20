@@ -21,7 +21,7 @@ const ChooseToolPage = () => {
             <br />
         </div>
         <div className="actions">
-            <button className="action-btn" onClick={selectCommunicate}>Communicate With Foreigners</button>
+            <button className="action-btn" onClick={selectCommunicate}>Talk In Another Language</button>
             <button className="action-btn" onClick={selectPractice}>Practice Pronunciation</button>
         </div>
         </div>
