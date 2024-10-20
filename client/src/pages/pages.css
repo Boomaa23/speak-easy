@@ -1,57 +1,135 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
+/* Define a color theme using CSS variables */
+:root {
+    --primary-color: #2c2213;  /* Dark brown */
+    --secondary-color: #e6d6c3;  /* Light beige */
+    --accent-color: #ec6666;  /* Red for recording status */
+    --hover-color: #522d12;  /* Darker brown for hover effects */
+    --disabled-color: #e2d0b8;  /* Light grey */
+    --playing-color: rgb(255, 0, 0);  /* Red for playing icon */
+    --ripple-opacity: 0.5;  /* Ripple transparency */
+}
+
 .page-container {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #d2b48c; /* Light brown monochrome background */
-    color: #4b3d2a; /* Dark brown text color */
-    /* font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Sans-serif font */ 
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
     font-family: "Inter", sans-serif;
     text-align: center;
-    flex-direction: column; /* Stack items vertically */
+    flex-direction: column;
 }
-  
+
 .core-text {
-    font-size: 2.5rem; /* Adjust font size to fill up most of the page */
+    font-size: 2.5rem;
     line-height: 1.5;
     max-width: 80%;
+    transition: transform 0.2s ease-in-out;
+}
+
+.core-text:hover {
+    transform: scale(1);
 }
 
 .highlight-bold {
-    font-weight: 700; /* Make 'SpeakEasy' bolder */
+    font-weight: 700;
 }
 
 .hover-highlight {
     cursor: pointer;
-    position: relative;
-    border-radius: 10px; /* Rounded corners */
-    padding: 0 5px; /* Add padding for better highlight visibility */
-    transition: background-color 0.6s ease-in-out, color 0.6s ease-in-out; /* Longer fade */
+    border-radius: 10px;
+    padding: 0 5px;
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
 }
 
 .hover-highlight:hover {
-    color: #8b4513; /* Change text color on hover (saddle brown) */
-    background-color: #f5deb3; /* Highlight background (wheat color) */
-    border-radius: 15px; /* Smoother rounded corners on hover */
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    transform: scale(1.1);
+    border-radius: 15px;
+}
+
+/* Microphone icon with pulsating rings */
+.mic-icon-container {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    margin-top: 20px;
+    width: 120px;
+    height: 120px;
 }
 
 .mic-icon {
-    display: inline-block;
-    cursor: pointer;
-    margin-left: 10px;
-    transition: transform 0.3s ease-in-out;
+    color: var(--primary-color);
+    font-size: 80px;
+    transition: transform 0.3s;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
 }
 
-.mic-icon.recording {
-    color: red;
-    transform: scale(1.2); /* Slightly enlarge the icon while recording */
+.recording .mic-icon {
+    animation: pulse 1.5s infinite;
+}
+
+/* Expanding ripple effect */
+.recording .mic-icon-container::before,
+.recording .mic-icon-container::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid var(--accent-color);
+    transform: translate(-50%, -50%);
+    animation: ripple 2s infinite;
+    opacity: 0;
+}
+
+.recording .mic-icon-container::after {
+    animation-delay: 1s;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.3;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Ripple animation for waves */
+@keyframes ripple {
+    0% {
+        width: 80px;
+        height: 80px;
+        opacity: var(--ripple-opacity);
+    }
+    100% {
+        width: 200px;
+        height: 200px;
+        opacity: 0;
+    }
 }
 
 .recording-status {
     font-size: 1.5rem;
-    color: #8b4513;
+    color: var(--accent-color);
     margin-top: 20px;
 }
 
@@ -65,32 +143,33 @@
 .action-btn {
     font-size: 2rem;
     margin: 10px;
-    padding: 20px 20px;
-    background-color: #8b4513; /* Saddle brown button */
-    color: white;
+    padding: 20px;
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
 }
 
 .action-btn:hover {
-    background-color: #f5deb3; /* Wheat color on hover */
-    color: #4b3d2a;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    transform: scale(1.1);
 }
 
 .play-icon {
-cursor: pointer;
-transition: color 0.3s ease;
+    cursor: pointer;
+    transition: color 0.3s;
 }
 
 .play-icon.playing {
-    color: red; /* Change color while playing */
+    color: var(--playing-color);
 }
 
 .playing-status {
     font-size: 1.2rem;
-    color: #8b4513;
+    color: var(--primary-color);
     margin-top: 10px;
 }
 
@@ -98,39 +177,43 @@ transition: color 0.3s ease;
     margin-top: 20px;
 }
 
+.language-btn {
+    font-size: 1.5rem;
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
+}
+
+.language-btn:hover {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    transform: scale(1.1);
+}
+
 .language-btn.selected {
-    background-color: #8b4513; /* Dark brown for selected */
+    background-color: var(--hover-color);
     color: white;
 }
-  
+
 .language-btn:disabled {
-    background-color: #d2b48c; /* Dimmed color */
+    background-color: var(--disabled-color);
     cursor: not-allowed;
 }
 
 .language-buttons {
     margin-top: 20px;
 }
-  
-.language-btn {
-    font-size: 1.5rem;
-    margin: 10px;
-    padding: 10px 20px;
-    background-color: #e5c8a7; /* Light beige */
-    color: #4b3d2a;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
 
 .fade-in-out {
-    transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.8s ease-in-out;
     opacity: 1;
-  }
-  
-  .fade-in-out.hidden {
+}
+
+.fade-in-out.hidden {
     opacity: 0;
-  }
-  
-  
+}

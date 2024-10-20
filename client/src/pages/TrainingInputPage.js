@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './pages.css'; // Import the custom styles
-import { FaMicrophone } from 'react-icons/fa'; // Import microphone icon
+import './pages.css';
+import { FaMicrophone } from 'react-icons/fa';
 
 const TrainingInputPage = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -10,64 +10,60 @@ const TrainingInputPage = () => {
   const [dots, setDots] = useState('');
   const navigate = useNavigate();
 
-  // Handle the "recording ..." dot animation
   useEffect(() => {
     if (isRecording) {
-      const dotInterval = setInterval(() => {
+      const interval = setInterval(() => {
         setDots((prev) => (prev.length < 3 ? prev + '.' : ''));
       }, 500);
-      return () => clearInterval(dotInterval);
+      return () => clearInterval(interval);
     } else {
       setDots('');
     }
   }, [isRecording]);
 
-  // Start or stop recording
   const toggleRecording = async () => {
     if (isRecording) {
-      // Stop recording
       recorder.stop();
       setIsRecording(false);
     } else {
-      // Start recording
-      if (!recorder) {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const mediaRecorder = new MediaRecorder(stream);
-        setRecorder(mediaRecorder);
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      setRecorder(mediaRecorder);
 
-        const audioChunks = [];
-        mediaRecorder.ondataavailable = (event) => {
-          audioChunks.push(event.data);
-        };
+      const audioChunks = [];
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunks.push(event.data);
+      };
 
-        mediaRecorder.onstop = () => {
-          const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-          const audioUrl = URL.createObjectURL(audioBlob);
-          setAudioURL(audioUrl); // Store the URL to play back
-        };
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudioURL(audioUrl);
+      };
 
-        mediaRecorder.start();
-        setIsRecording(true);
-      } else {
-        recorder.start();
-        setIsRecording(true);
-      }
+      mediaRecorder.start();
+      setIsRecording(true);
     }
   };
 
-  // Handle navigation to the next page and sending data to backend
   const handleNext = async () => {
     if (audioURL) {
-      const audio_response = await fetch(audioURL);
-      const audioBlob = await audio_response.blob(); // Get the audio file as a Blob
+      const audioResponse = await fetch(audioURL);
+      const audioBlob = await audioResponse.blob();
 
-      const formData = new FormData(); // Create FormData here
+      const formData = new FormData();
       formData.append('audio', audioBlob, 'audio.mp3');
+<<<<<<< HEAD
       // Send audio to backend (example: using fetch)
       const response = await fetch('http://127.0.0.1:5000/api/train', {
+=======
+
+      const response = await fetch('http://localhost:5000/api/train', {
+>>>>>>> d8168ab (making UI  a beaut)
         method: 'POST',
-        body: formData
+        body: formData,
       });
+<<<<<<< HEAD
       // Check if request was successful
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
@@ -78,6 +74,13 @@ const TrainingInputPage = () => {
 
       document.cookie = `user_id=${user_id}; path=/; expires=${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString()}`;
 
+=======
+
+      if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+
+      const data = await response.json();
+      console.log(data);
+>>>>>>> d8168ab (making UI  a beaut)
       navigate('/choosetool');
     }
   };
@@ -89,20 +92,26 @@ const TrainingInputPage = () => {
         speaking. You can say whatever you want, just make sure that you speak in 
         <span className="highlight-bold"> English</span>. Please speak as clearly as possible, 
         avoiding background noises and long pauses.
-        <br />
-        <br />
-        Click the microphone icon to start recording:
-        <span className={`mic-icon ${isRecording ? 'recording' : ''}`} onClick={toggleRecording}>
-          <FaMicrophone size={30} />
-        </span>
       </div>
-      {isRecording && (
-        <div className="recording-status">Recording{dots}</div>
-      )}
+
+      {/* Microphone icon container */}
+      <div
+        className={`mic-icon-container ${isRecording ? 'recording' : ''}`}
+        onClick={toggleRecording}
+      >
+        <FaMicrophone className="mic-icon" />
+      </div>
+
+      {isRecording && <div className="recording-status">Recording{dots}</div>}
+
       {audioURL && !isRecording && (
         <div className="actions">
-          <button className="action-btn" onClick={handleNext}>Next</button>
-          <button className="action-btn" onClick={toggleRecording}>Record Again</button>
+          <button className="action-btn" onClick={handleNext}>
+            Next
+          </button>
+          <button className="action-btn" onClick={toggleRecording}>
+            Record Again
+          </button>
         </div>
       )}
     </div>
