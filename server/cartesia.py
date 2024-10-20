@@ -57,18 +57,22 @@ def localize_voice(voice_id, target_language):
         method='POST'
     ).json()
 
-    localized_voice = _cartesia_request(
+    localized_voice = create_voice(original_voice['name'], target_language, original_voice['embedding'])
+
+    return localized_voice
+
+
+def create_voice(name, language, embedding):
+    return _cartesia_request(
         '/voices/create',
         data={
-            'name': original_voice['name'],
-            'description': f'{original_voice["name"]} (localized to {target_language})',
-            'embedding': localized_embedding['embedding'],
-            'language': target_language,
+            'name': name,
+            'description': f'{name} ({language})',
+            'embedding': embedding,
+            'language': language,
         },
         method='POST'
     )
-
-    return localized_voice
 
 
 def _cartesia_request(endpoint, method='GET', **kwargs):
