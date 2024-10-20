@@ -78,9 +78,12 @@ def api_upload_audio_learn():
     user_transcription = feedback.transcribe_audio(user_audio_path)
 
     # Retrieve and transcribe the example audio file
-    correct_audio_path = "audio_phrase_learn.mp3"
-    correct_transcription = feedback.transcribe_audio(correct_audio_path)
-
+    correct_transcription = request.form.get('foreign_text', None)
+    print(correct_transcription)
+    if (correct_transcription == None):
+        correct_audio_path = "audio_phrase_learn.mp3"
+        correct_transcription = feedback.transcribe_audio(correct_audio_path)
+    print(correct_transcription)
     # Compare transcriptions and make suggestions
     diff = feedback.compare_transcriptions(correct_transcription, user_transcription)
     suggestions = feedback.generate_suggestions(diff)
