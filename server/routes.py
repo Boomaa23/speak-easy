@@ -1,24 +1,20 @@
 import flask
-import request
-import jsonify
 import words
 import io
 import os
+import cartesia
+import feedback
+
 from storage import create_user, create_voice
 from googletrans import Translator
-from flask import make_response, send_file
-from cartesia import text_to_speech, clone_voice, localize_voice
-from feedback import transcribe_audio, compare_transcriptions, generate_suggestions
+from flask import make_response, send_file, request, jsonify
 
-UPLOAD_FOLDER = 'test'
+
 api_blueprint = flask.Blueprint('api', __name__)
 
 index_w = 0
 index_p = 0
 
-@api_blueprint.route('/api/', methods=['GET'])
-def api_get_eggs():
-    return "eggs"
 
 # Both modes: trains the voice model
 @api_blueprint.route('/api/train', methods=['POST'])
@@ -26,8 +22,7 @@ def api_train():
     if 'audio' not in request.files:
         return jsonify({'error': 'No audio file provided'}), 400
     audio = request.files['audio']
-    with open(audio, 'rb') as f:
-        response = clone_voice(f)
+    response = cartesia.clone_voice(audio)
     if response.status_code == 200:
         create_user(response.json())
         create_voice(response.json())
@@ -44,18 +39,18 @@ def api_upload_audio_learn():
     audio = request.files['audio']
 
     # Save and transcribe the audio file
-    user_audio_path = os.path.join(os.path.expanduser('~'), 'last_try.mp3')
-    audio.save(user_audio_path)
-    user_transcription = transcribe_audio(user_audio_path)
+    audio.save('last_try.mp3')
+    user_transcription = feedback.transcribe_audio('last_try.mp3')
 
     # Retrieve and transcribe the example audio file
     correct_audio_path = "last_example.mp3"
-    correct_transcription = transcribe_audio(correct_audio_path)
+    correct_transcription = feedback.transcribe_audio(correct_audio_path)
 
     # Compare transcriptions and make suggestions
-    diff = compare_transcriptions(correct_transcription, user_transcription)
-    suggestions = generate_suggestions(diff)
+    diff = feedback.compare_transcriptions(correct_transcription, user_transcription)
+    suggestions = feedback.generate_suggestions(diff)
     return jsonify(suggestions)
+
 
 # Communication mode: retrieves the audio clip from the user and translates into the desired language
 @api_blueprint.route('/api/upload_get_translate', methods=['POST'])
@@ -69,7 +64,7 @@ def api_upload_audio_comm():
     # Save and transcribe the audio file
     user_audio_path = os.path.join(os.path.expanduser('~'), 'last_try.mp3')
     audio.save(user_audio_path)
-    user_transcription = transcribe_audio(user_audio_path)
+    user_transcription = feedback.transcribe_audio(user_audio_path)
     
     # Translate the audio file
     translator = Translator()
@@ -84,6 +79,7 @@ def api_upload_audio_comm():
     tts_response = text_to_speech(translation, voice_id, language)
     return tts_response
 
+
 # Learning Mode: retrieves the next word to practice
 @api_blueprint.route('/api/nextword', methods=['GET'])
 def api_get_next_word():
@@ -92,6 +88,7 @@ def api_get_next_word():
     language = request.args.get('language', 'en')
     index_w += 1
     return jsonify(words.practice_word(i, language))
+
 
 # Learning Mode: retrieves the next phrase to practice
 @api_blueprint.route('/api/nextphrase', methods=['GET'])
@@ -102,6 +99,7 @@ def api_get_next_phrase():
     index_p += 1
     return jsonify(words.practice_phrase(i, language))
 
+
 # Learning Mode: Stores and returns a given phrase in a given language
 @api_blueprint.route('/api/speak', methods=['GET'])
 def api_speak():
@@ -109,18 +107,23 @@ def api_speak():
     words = request.args.get('words', 'Hello World')
     # TODO get user ID from frontend to get voice id from storage
     voice_id = None  
-    response = text_to_speech(words, voice_id, language)
+    response = cartesia.text_to_speech(words, voice_id, language)
 
     if response.status_code == 200:
         # Save the audio clip to the root directory
-        output_file_path = os.path.join(os.path.expanduser('~'), 'last_example.mp3')  # This saves to your home directory
-        with open(output_file_path, 'wb') as audio_file:
+        with open('last_example.mp3', 'wb') as audio_file:
             audio_file.write(response.content)
 
         # Send the file back in the response
         mp3_buffer = io.BytesIO(response.content)
-        response = make_response(send_file(mp3_buffer, as_attachment=True, download_name="output.mp3", mimetype="audio/mpeg"))
+        response = make_response(send_file(
+            mp3_buffer,
+            as_attachment=True,
+            download_name="output.mp3",
+            mimetype="audio/mpeg"
+        ))
         return response
     else:
-        return jsonify({"error": "Failed to generate audio", "status": response.status_code, "message": response.text}), response.status_code
+        return jsonify({"error": "Failed to generate audio",
+                        "status": response.status_code, "message": response.text}), response.status_code
 
