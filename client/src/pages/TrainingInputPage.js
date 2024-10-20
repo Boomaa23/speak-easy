@@ -53,34 +53,16 @@ const TrainingInputPage = () => {
 
       const formData = new FormData();
       formData.append('audio', audioBlob, 'audio.mp3');
-<<<<<<< HEAD
-      // Send audio to backend (example: using fetch)
-      const response = await fetch('http://127.0.0.1:5000/api/train', {
-=======
 
       const response = await fetch('http://localhost:5000/api/train', {
->>>>>>> d8168ab (making UI  a beaut)
         method: 'POST',
         body: formData,
       });
-<<<<<<< HEAD
-      // Check if request was successful
-      if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
-      }
-      const data = await response.json();  // Parse JSON response
-      
-      let user_id = data.user_id;
-
-      document.cookie = `user_id=${user_id}; path=/; expires=${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString()}`;
-
-=======
 
       if (!response.ok) throw new Error(`Error: ${response.statusText}`);
 
       const data = await response.json();
       console.log(data);
->>>>>>> d8168ab (making UI  a beaut)
       navigate('/choosetool');
     }
   };
@@ -89,8 +71,8 @@ const TrainingInputPage = () => {
     <div className="page-container">
       <div className="core-text">
         First, we're going to need to know how you sound. Please record a 10-20 second sample of yourself 
-        speaking. You can say whatever you want, just make sure that you speak in 
-        <span className="highlight-bold"> English</span>. Please speak as clearly as possible, 
+        speaking. You can say whatever you want, just make sure that you speak in your 
+        <span className="highlight-bold"> native language</span>. Please speak as clearly as possible, 
         avoiding background noises and long pauses.
       </div>
 
