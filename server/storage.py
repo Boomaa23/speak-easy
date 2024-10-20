@@ -131,6 +131,9 @@ def get_voices_by_user_id(user_id):
     user = get_user_by_id(user_id)
     return user.get_voices()
 
+def user_exists(user_id):
+    """Check if a user with the given ID exists in the database."""
+    return User.query.get(user_id) is not None
 
 
 
