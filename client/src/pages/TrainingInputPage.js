@@ -64,7 +64,7 @@ const TrainingInputPage = () => {
       const formData = new FormData(); // Create FormData here
       formData.append('audio', audioBlob, 'audio.mp3');
       // Send audio to backend (example: using fetch)
-      const response = await fetch('http://localhost:5000/api/train', {
+      const response = await fetch('http://127.0.0.1:5000/api/train', {
         method: 'POST',
         body: formData
       });
