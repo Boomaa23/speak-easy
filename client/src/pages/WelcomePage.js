@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { clearCookies } from '../cookieUtils.js';
 import './pages.css';
 
 const WelcomePage = () => {
@@ -29,6 +30,12 @@ const WelcomePage = () => {
         <br />
         <br />
         Press any key to get started
+        <br />
+        <br />
+            {/* Button to clear cookies */}
+            <button onClick={clearCookies} className="clear-cookies-button">
+          Clear Cookies
+        </button>
       </div>
     </div>
   );

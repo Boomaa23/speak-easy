@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaMicrophone, FaPlay } from 'react-icons/fa';
+import { FaMicrophone, FaPlay, FaSpinner } from 'react-icons/fa'; // Import spinner icon
 import { getCookie } from '../cookieUtils.js';
 import './pages.css';
+import HomeButton from '../components/HomeButton';
 
 const CommunicatePage = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -14,6 +15,7 @@ const CommunicatePage = () => {
   const [translatedAudioURL, setTranslatedAudioURL] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState('');
   const [showRecordingSection, setShowRecordingSection] = useState(false);
+  const [loading, setLoading] = useState(false); // State to manage loading
   const navigate = useNavigate();
 
   // Start recording 1 second after the component mounts
@@ -86,6 +88,7 @@ const CommunicatePage = () => {
 
   const handleTranslate = async () => {
     if (audioURL) {
+      setLoading(true); // Set loading to true when starting translation
       const audioResponse = await fetch(audioURL);
       const audioBlob = await audioResponse.blob();
       const formData = new FormData();
@@ -104,11 +107,13 @@ const CommunicatePage = () => {
       const translatedAudioBlob = await response.blob();
       const translatedAudioURL = URL.createObjectURL(translatedAudioBlob);
       setTranslatedAudioURL(translatedAudioURL);
+      setLoading(false); // Set loading to false when translation is complete
     }
   };
 
   return (
     <div className="page-container">
+      <HomeButton />
       {!selectedLanguage && (
         <>
           <div className="core-text">Which language would you like to speak in?</div>
@@ -147,23 +152,26 @@ const CommunicatePage = () => {
               <button className="action-btn" onClick={handleTranslate}>
                 Translate Audio
               </button>
+              {loading && (
+                <div className="loading-icon">
+                  <FaSpinner className="spinner" />
+                </div>
+              )}
             </div>
           )}
 
           {translatedAudioURL && (
             <div className="translated-audio">
-              <div className="core-text">Translated audio with your tone:</div>
+              <div className="core-text">Click the Play button below to hear your translated voice!</div>
               <div className="actions">
-                <span
-                  className={`play-icon ${playingAudio ? 'playing' : ''}`}
-                  onClick={handlePlayAudio}
-                >
-                  <FaPlay />
-                </span>
+                <div className="play-button-wrapper">
+                  <span className={`play-icon ${playingAudio ? 'playing' : ''}`} onClick={handlePlayAudio}>
+                    <FaPlay />
+                  </span>
+                </div>
               </div>
             </div>
           )}
-
         </>
       )}
     </div>

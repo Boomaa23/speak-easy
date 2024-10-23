@@ -111,6 +111,7 @@ def api_upload_audio_comm():
     # Retrieve the voice id of the user for the desired language
     user_id = request.form["user_id"]
     user = storage.get_user_by_id(user_id=user_id)
+    print(user_id)
     if (user.speaks_lang(language)):
         voice_id = user.get_voiceid_from_lang(language)
     else:

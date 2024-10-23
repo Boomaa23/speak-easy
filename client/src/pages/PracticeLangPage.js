@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { getCookie } from '../cookieUtils.js'; // Assuming you have a utility to get cookies
 import { FaMicrophone } from 'react-icons/fa'; // Import microphone icon
 import './pages.css'; // Import the custom styles
+import HomeButton from '../components/HomeButton';
 
 const PracticeLangPage = () => {
   const [language, setLanguage] = useState('');
@@ -150,6 +151,7 @@ const PracticeLangPage = () => {
   return (
     <div className="page-container">
       {/* Conditional rendering for the language selection prompt */}
+      <HomeButton />
       {!language && (
         <div className="core-text">
           Cool, let's practice some pronunciation! What language are you trying to learn?
@@ -184,15 +186,15 @@ const PracticeLangPage = () => {
                 </div>
               )}
               {exAudioPlayed && (
-                <div>
-                Now it's your turn!
-                <b></b>
-                <div>
-                  <span>Click the microphone icon to start recording:</span>
-                  <span className={`mic-icon-2 ${isRecording ? 'recording' : ''}`} onClick={toggleRecording}>
-                    <FaMicrophone size={30} />
-                  </span>
-                </div>
+                <div style={{ textAlign: 'center' }}>
+                  Now it's your turn!
+                  <b></b>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ marginRight: '10px' }}>Click the microphone icon to start/stop the recording:</span>
+                    <span className={`mic-icon-2 ${isRecording ? 'recording' : ''}`} onClick={toggleRecording}>
+                      <FaMicrophone size={40} />
+                    </span>
+                  </div>
                 </div>
               )}
               {audioUrl && !isRecording && (

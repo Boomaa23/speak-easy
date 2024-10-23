@@ -64,10 +64,10 @@
 .mic-icon1 {
     font-size: 80px;
     color: var(--primary-color);
-    position: absolute;
-    top: 55%;
-    left: 50%;
-    transform: translate(-50%, -95%);
+    position: relative;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
     transition: transform 0.3s ease;
 }
 
@@ -90,11 +90,43 @@
     }
 }
 
+/* Microphone icon and container */
+
+.mic-icon2 {
+    font-size: 80px;
+    color: var(--primary-color);
+    position: absolute;
+    top: 1000%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.3s ease;
+}
+
+.mic-icon2.recording {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+
 /* Ripple effect */
 .mic-icon-container.recording::before,
 .mic-icon-container.recording::after {
     content: "";
-    position: absolute;
+    position: relative;
     top: 50%;
     left: 50%;
     width: 80px;
@@ -217,6 +249,14 @@
 /* Translated audio section */
 .translated-audio {
     margin-top: 20px;
+    max-width: 900px;
+    font-size: 2rem;
+    line-height: 1.5;
+    margin-bottom: 30px;
+    color: var(--primary-color);
+    transition: transform 0.2s ease-in-out;
+    position: relative;
+    left: 5%;
 }
 
 /* Fade-in/out effect */
@@ -229,16 +269,56 @@
     opacity: 0;
 }
 
-/* Play icon improvements */
+/* Wrapper to hold the button in place */
+.play-button-wrapper {
+    position: absolute;
+    top: 130%; /* Adjust this value based on your layout */
+    left: 36%; /* Adjust this value based on your layout */
+    width: 80px; /* Width of the button */
+    height: 80px; /* Height of the button */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Play button styling */
 .play-icon {
     cursor: pointer;
-    transition: transform 0.3s, color 0.3s, background-color 0.3s;
-    font-size: 40px; /* Make it a bit larger */
-    padding: 10px;
+
+    width: 100%; /* Full width of the wrapper */
+    height: 100%; /* Full height of the wrapper */
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border-radius: 50%;
     background-color: var(--primary-color);
     color: var(--secondary-color);
+    font-size: 40px;
+    transition: color 0.3s, background-color 0.3s;
+    transform: translateX(-20px);
+    transform: translateY(-20px);
 }
+
+/* Apply animation only to the play icon */
+.play-icon.playing {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: var(--playing-color);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1); /* Scale stays at 1 at the start and end */
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1); /* Scale grows slightly in the middle */
+        opacity: 0.8;
+    }
+}
+
 
 .play-icon:hover {
     background-color: var(--hover-color);
@@ -246,19 +326,22 @@
     color: white;
 }
 
-.play-icon.playing {
-    color: var(--playing-color);
-    animation: pulse 1s infinite;
+
+
+.loading-icon {
+    margin-top: 10px; /* Space between the button and the spinner */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: scale(1.1);
-        opacity: 0.8;
-    }
+.spinner {
+    font-size: 24px; /* Adjust size of the spinner */
+    animation: spin 1s linear infinite; /* Spin animation */
 }
 
+/* Spin animation for loading */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

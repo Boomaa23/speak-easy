@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './training.css';
 import { FaMicrophone } from 'react-icons/fa';
+import { getCookie, setCookie } from '../cookieUtils.js';
 
 const TrainingInputPage = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -90,6 +91,9 @@ const TrainingInputPage = () => {
       if (!response.ok) throw new Error(`Error: ${response.statusText}`);
 
       const data = await response.json();
+      if (!getCookie("user_id")) {
+        setCookie("user_id", data["user_id"])
+      }
       console.log(data);
       navigate('/choosetool');
     }

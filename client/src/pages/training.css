@@ -67,15 +67,15 @@
     transform: translate(-50%, -50%); /* Centers the icon */
 }
 
-.mic-icon-2 {
+/*.mic-icon-2 {
     font-size: 70px;
     color: var(--primary-color);
     transition: transform 0.3s ease;
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* Centers the icon */
-}
+    transform: translate(-50%, -50%); 
+} */
 
 .mic-icon-container.recording .mic-icon {
     animation: pulse 1.5s infinite;
